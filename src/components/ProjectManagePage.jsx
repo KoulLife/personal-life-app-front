@@ -58,9 +58,48 @@ const ProjectManagePage = () => {
         return '#f5cd47';                       // Yellow/Default
     };
 
-    const toggleRow = (taskId) => {
-        setTasks(tasks.map(task =>
-            task.id === taskId ? { ...task, expanded: !task.expanded } : task
+    const toggleRow = async (taskId) => {
+        const task = tasks.find(t => t.id === taskId);
+
+        // If we are about to expand
+        if (!task.expanded) {
+            try {
+                const token = localStorage.getItem('accessToken');
+                const response = await fetch(`${process.env.REACT_APP_API_URL}/project-group/${taskId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+
+                    // Map projects to subtasks
+                    const subtasks = (data.projects || []).map(p => ({
+                        id: p.projectId,
+                        title: p.content,
+                        status: p.completeStatus ? 'DONE' : 'TODO',
+                        statusClass: p.completeStatus ? 'status-done' : 'status-todo',
+                        timeline: {
+                            width: p.completeStatus ? '100%' : '0%',
+                            background: p.completeStatus ? '#4bce97' : '#f5cd47'
+                        }
+                    }));
+
+                    setTasks(prev => prev.map(t =>
+                        t.id === taskId ? { ...t, subtasks: subtasks, expanded: true } : t
+                    ));
+                    return;
+                }
+            } catch (error) {
+                console.error('Error fetching project details:', error);
+            }
+        }
+
+        // Default toggling behavior (collapse or fallback if fetch fails)
+        setTasks(prev => prev.map(t =>
+            t.id === taskId ? { ...t, expanded: !t.expanded } : t
         ));
     };
 

@@ -1,0 +1,320 @@
+/* Main Layout */
+.main-layout {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    position: relative;
+    overflow: hidden;
+    color: white;
+}
+
+.layout-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(10, 10, 20, 0.85);
+    z-index: 1;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 260px;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(15px);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 100;
+    /* Higher than content */
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    box-sizing: border-box;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.content-area {
+    flex: 1;
+    position: relative;
+    z-index: 2;
+    overflow-y: auto;
+    padding: 40px;
+}
+
+/* Mobile Toggle Button */
+.mobile-menu-btn {
+    display: none;
+    /* Hidden on desktop */
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 50;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    backdrop-filter: blur(5px);
+    transition: background 0.2s;
+}
+
+.mobile-menu-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Mobile Backdrop */
+.mobile-backdrop {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(2px);
+    z-index: 90;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+}
+
+.mobile-backdrop.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Sidebar Elements */
+.sidebar-header-mobile {
+    display: none;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.close-sidebar-btn {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.app-brand {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 40px;
+    padding-left: 10px;
+    letter-spacing: 0.5px;
+}
+
+.new-entry-btn {
+    width: 100%;
+    padding: 12px;
+    border-radius: 30px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    text-align: left;
+    padding-left: 20px;
+    cursor: pointer;
+    margin-bottom: 30px;
+    transition: background 0.2s;
+}
+
+.new-entry-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.nav-section {
+    flex: 1;
+}
+
+.nav-label {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 15px;
+    padding-left: 10px;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    border-radius: 10px;
+    cursor: pointer;
+    color: rgba(255, 255, 255, 0.8);
+    transition: background 0.2s, color 0.2s;
+    font-size: 14px;
+    text-decoration: none;
+    margin-bottom: 5px;
+}
+
+.nav-item:hover,
+.nav-item.active {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.nav-icon {
+    margin-right: 12px;
+}
+
+.user-section {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 20px;
+}
+
+.logout-btn {
+    display: flex;
+    align-items: center;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 10px;
+    width: 100%;
+    transition: color 0.2s;
+}
+
+.logout-btn:hover {
+    color: #ff6b6b;
+}
+
+/* Dashboard Home */
+.dashboard-home {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.greeting-section {
+    text-align: center;
+    margin-top: 60px;
+    margin-bottom: 60px;
+}
+
+.greeting-section h1 {
+    font-size: 32px;
+    margin-bottom: 10px;
+    font-weight: 500;
+}
+
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.dashboard-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 20px;
+    cursor: pointer;
+    transition: transform 0.2s, border-color 0.2s;
+    height: 180px;
+    display: flex;
+    flex-direction: column;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    font-weight: 500;
+}
+
+.card-icon {
+    margin-right: 10px;
+    font-size: 18px;
+}
+
+.card-preview {
+    flex: 1;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .mobile-menu-btn {
+        display: block;
+        /* Show hamburger */
+        top: 25px;
+        left: 25px;
+        padding: 12px;
+        font-size: 18px;
+    }
+
+    .mobile-backdrop {
+        display: block;
+        /* Enable backdrop logic */
+    }
+
+    .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        transform: translateX(-100%);
+        /* Hide by default */
+        width: 80%;
+        max-width: 300px;
+        box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .sidebar.open {
+        transform: translateX(0);
+        /* Show when open */
+    }
+
+    .sidebar-header-mobile {
+        display: flex;
+    }
+
+    .desktop-brand {
+        display: none;
+    }
+
+    .content-area {
+        padding: 90px 20px 20px 20px;
+        /* More top padding for hamburger */
+    }
+
+    .greeting-section h1 {
+        font-size: 22px;
+    }
+
+    .greeting-section p {
+        font-size: 14px;
+    }
+
+    .greeting-section {
+        margin-top: 10px;
+        margin-bottom: 30px;
+    }
+
+    .cards-grid {
+        grid-template-columns: 1fr;
+        /* Single column on mobile */
+        gap: 15px;
+    }
+
+    .dashboard-card {
+        height: 140px;
+        /* Reduced height on mobile */
+        padding: 15px;
+    }
+}

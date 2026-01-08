@@ -1,0 +1,364 @@
+/* Project Manage Page Container */
+.project-manage-container {
+    display: flex;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
+
+/* Local Sidebar */
+.project-sidebar {
+    width: 240px;
+    background: rgba(0, 0, 0, 0.2);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.project-info {
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.project-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #6e8efb, #a777e3);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 18px;
+    margin-right: 12px;
+}
+
+.project-details .project-name {
+    font-weight: 600;
+    font-size: 15px;
+    line-height: 1.2;
+}
+
+.project-details .project-cat {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.project-menu-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.4);
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.project-menu-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 12px;
+    border-radius: 6px;
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    margin-bottom: 2px;
+    transition: background 0.2s, color 0.2s;
+    font-size: 14px;
+}
+
+.project-menu-item:hover,
+.project-menu-item.active {
+    background: rgba(255, 255, 255, 0.1);
+    color: #6e8efb;
+}
+
+.project-menu-icon {
+    margin-right: 10px;
+    width: 16px;
+    text-align: center;
+}
+
+/* Main Content Area */
+.project-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Header */
+.project-header {
+    padding: 20px 30px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.breadcrumb {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 8px;
+}
+
+.header-title h1 {
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.header-controls {
+    display: flex;
+    gap: 10px;
+}
+
+.control-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.control-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.primary-btn {
+    background: #6e8efb;
+    border: none;
+    font-weight: 600;
+}
+
+.primary-btn:hover {
+    background: #5d7ce6;
+}
+
+/* Roadmap Visualization */
+.roadmap-container {
+    flex: 1;
+    overflow-x: auto;
+    overflow-y: auto;
+    padding: 20px 30px;
+}
+
+.roadmap-search-bar {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 30px;
+    align-items: center;
+}
+
+.search-input {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    padding: 8px 12px;
+    color: white;
+    width: 200px;
+    font-size: 13px;
+}
+
+.filter-group {
+    display: flex;
+    gap: 10px;
+}
+
+.user-avatars {
+    display: flex;
+    margin-left: 10px;
+}
+
+.avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #555;
+    border: 2px solid #2a2a2a;
+    /* Should match bg */
+    margin-left: -8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+/* Gantt Chart Mockup */
+.gantt-chart {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.chart-header {
+    display: contents;
+}
+
+.header-cell {
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.timeline-months {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.month-cell {
+    padding: 12px;
+    text-align: center;
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Task Rows */
+.task-row {
+    display: contents;
+}
+
+.task-info {
+    padding: 10px 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+}
+
+.task-title-wrapper {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.expand-icon {
+    font-size: 10px;
+    margin-right: 8px;
+    color: rgba(255, 255, 255, 0.5);
+    transition: color 0.2s;
+}
+
+.task-title-wrapper:hover .expand-icon {
+    color: white;
+}
+
+.task-title {
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.task-status {
+    font-size: 10px;
+    margin-top: 4px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.1);
+    align-self: flex-start;
+    margin-left: 18px;
+    /* Align with text after chevron */
+}
+
+/* Nested Rows */
+.nested-row .task-info {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.nested-row .timeline-track {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.status-done {
+    background: #4bce97;
+    color: #000;
+}
+
+.status-progress {
+    background: #579dff;
+    color: #000;
+}
+
+.status-todo {
+    background: #e2e2e2;
+    color: #000;
+}
+
+.timeline-track {
+    padding: 10px 0;
+    position: relative;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Timeline Bars */
+.timeline-bar {
+    height: 24px;
+    border-radius: 4px;
+    position: relative;
+    cursor: pointer;
+    transition: filter 0.2s;
+}
+
+.timeline-bar:hover {
+    filter: brightness(1.2);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .project-manage-container {
+        flex-direction: column;
+        overflow-y: auto;
+    }
+
+    .project-sidebar {
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        overflow-x: auto;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 10px;
+        gap: 15px;
+    }
+
+    .project-info {
+        margin-bottom: 0;
+        min-width: 150px;
+    }
+
+    .project-menu-label {
+        display: none;
+    }
+
+    .project-menu-item {
+        white-space: nowrap;
+    }
+
+    .gantt-chart {
+        grid-template-columns: 140px 1fr;
+    }
+
+    .header-controls {
+        display: none;
+        /* Simplify on mobile */
+    }
+
+    .avatar {
+        width: 24px;
+        height: 24px;
+        font-size: 9px;
+    }
+}

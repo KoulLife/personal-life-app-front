@@ -104,10 +104,45 @@ const ProjectServiceMapPage = () => {
     const nodeTypes = useMemo(() => ({ custom: CustomNode }), []);
 
     const onConnect = useCallback(
-        (params) =>
+        async (params) => {
+            // Optimistic UI update with custom styles
             setEdges((eds) =>
-                addEdge({ ...params, type: ConnectionLineType.SmoothStep, animated: true }, eds)
-            ),
+                addEdge({
+                    ...params,
+                    type: ConnectionLineType.SmoothStep,
+                    animated: true,
+                    style: { stroke: '#6e8efb', strokeWidth: 2 },
+                    markerEnd: {
+                        type: MarkerType.ArrowClosed,
+                        width: 20,
+                        height: 20,
+                        color: '#6e8efb',
+                    }
+                }, eds)
+            );
+
+            try {
+                const token = localStorage.getItem('accessToken');
+                const response = await fetch(`${process.env.REACT_APP_API_URL}/project/${params.source}/${params.target}/connect`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to connect');
+                }
+
+                // Optional: Fetch data to ensure backend sync (e.g. if cycle detection etc happens on backend)
+                // fetchData(); 
+            } catch (error) {
+                console.error('Connection failed:', error);
+                alert('Failed to connect projects. Please try again.');
+                // Revert optimistic update
+                setEdges((eds) => eds.filter(e => !(e.source === params.source && e.target === params.target)));
+            }
+        },
         [setEdges]
     );
 
@@ -286,18 +321,41 @@ const ProjectServiceMapPage = () => {
         }
     };
 
+    const handleInputKeyDown = (e, callback) => {
+        if (e.nativeEvent.isComposing) return;
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            callback();
+        }
+    };
+
     return (
         <div className="service-map-container">
             <div className="map-header">
-                <button
-                    onClick={() => navigate(-1)}
-                    className="map-back-btn"
-                >
-                    <FaArrowLeft /> Back
-                </button>
-                <div className="map-title-group">
-                    <h1>{projectGroup ? projectGroup.groupName : 'Loading...'}</h1>
-                    <span className="map-badge">SERVICE MAP</span>
+                <div className="header-left">
+                    <button
+                        onClick={() => navigate(-1)}
+                        className="map-back-btn"
+                    >
+                        <FaArrowLeft /> Back
+                    </button>
+                    <div className="map-title-group">
+                        <h1>{projectGroup ? projectGroup.groupName : 'Loading...'}</h1>
+                        <span className="map-badge">SERVICE MAP</span>
+                    </div>
+                </div>
+
+                <div className="map-controls">
+                    <button
+                        className="map-create-btn"
+                        onClick={() => {
+                            setSelectedNode(null);
+                            setNewProjectContent('');
+                            setIsPanelOpen(true);
+                        }}
+                    >
+                        <FaPlus /> Create Project
+                    </button>
                 </div>
             </div>
 
@@ -350,7 +408,7 @@ const ProjectServiceMapPage = () => {
                                             className="creation-input"
                                             value={editContent}
                                             onChange={(e) => setEditContent(e.target.value)}
-                                            onKeyDown={(e) => e.key === 'Enter' && handleEditProject()}
+                                            onKeyDown={(e) => handleInputKeyDown(e, handleEditProject)}
                                             autoFocus
                                         />
                                         <button className="icon-btn save-btn" onClick={handleEditProject} title="Save Name"><FaSave /></button>
@@ -388,7 +446,7 @@ const ProjectServiceMapPage = () => {
                                         placeholder="Next project name..."
                                         value={newProjectContent}
                                         onChange={(e) => setNewProjectContent(e.target.value)}
-                                        onKeyDown={(e) => e.key === 'Enter' && handleCreateProject()}
+                                        onKeyDown={(e) => handleInputKeyDown(e, handleCreateProject)}
                                     />
                                     <button className="creation-submit-btn" onClick={handleCreateProject}>
                                         <FaPlus /> Add
@@ -405,7 +463,7 @@ const ProjectServiceMapPage = () => {
                                 placeholder="Root project name..."
                                 value={newProjectContent}
                                 onChange={(e) => setNewProjectContent(e.target.value)}
-                                onKeyDown={(e) => e.key === 'Enter' && handleCreateProject()}
+                                onKeyDown={(e) => handleInputKeyDown(e, handleCreateProject)}
                             />
                             <button className="creation-submit-btn" onClick={handleCreateProject}>
                                 <FaPlus /> Create

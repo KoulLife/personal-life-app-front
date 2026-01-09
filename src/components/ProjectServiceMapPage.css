@@ -15,8 +15,22 @@
     left: 40px;
     z-index: 10;
     color: white;
+    color: white;
     pointer-events: none;
     /* Let clicks pass through if needed, but buttons need pointer-events auto */
+    right: 40px;
+    /* Add right constraint for flex layout */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-left {
+    display: flex;
+    flex-direction: column;
+    /* Stack back button and title */
+    gap: 0px;
+    pointer-events: auto;
 }
 
 .map-back-btn {
@@ -48,6 +62,8 @@
     gap: 15px;
 }
 
+/* Force update */
+
 .map-title-group h1 {
     font-size: 32px;
     font-weight: 700;
@@ -68,6 +84,30 @@
     font-size: 11px;
     font-weight: 600;
     letter-spacing: 1px;
+}
+
+.map-controls {
+    pointer-events: auto;
+}
+
+.map-create-btn {
+    background: linear-gradient(135deg, #6e8efb 0%, #a777e3 100%);
+    border: none;
+    padding: 10px 24px;
+    border-radius: 12px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 15px rgba(110, 142, 251, 0.3);
+    transition: all 0.2s;
+}
+
+.map-create-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(110, 142, 251, 0.4);
 }
 
 /* CUSTOM NODE STYLES - The Trendy Part */

@@ -37,7 +37,7 @@ const SignupPage = () => {
                 throw new Error(errorData || '회원가입에 실패했습니다.');
             }
 
-            alert('회원가입 성공!');
+            alert('회원가입 성공! 로그인 해주세요.');
             navigate('/login');
 
         } catch (err) {

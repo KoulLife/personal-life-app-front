@@ -1,7 +1,14 @@
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from './components/LoginPage';
 import SignupPage from './components/SignupPage';
+import ProtectedRoute from './components/ProtectedRoute';
+import MainLayout from './components/MainLayout';
+import DashboardHome from './components/DashboardHome';
+import ProjectManagePage from './components/ProjectManagePage';
 import './App.css';
+
+import ProjectServiceMapPage from './components/ProjectServiceMapPage';
 
 function App() {
   return (
@@ -11,6 +18,16 @@ function App() {
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
+
+          {/* Protected Dashboard Routes */}
+          <Route path="/dashboard" element={<ProtectedRoute />}>
+            <Route element={<MainLayout />}>
+              <Route index element={<DashboardHome />} />
+              <Route path="project" element={<ProjectManagePage />} />
+              <Route path="project-group/:groupId" element={<ProjectServiceMapPage />} />
+              {/* Future routes can be added here */}
+            </Route>
+          </Route>
         </Routes>
       </div>
     </Router>

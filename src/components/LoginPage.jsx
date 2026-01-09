@@ -8,6 +8,7 @@ const LoginPage = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const navigate = useNavigate();
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -32,9 +33,8 @@ const LoginPage = () => {
             if (data.accessToken) {
                 localStorage.setItem('accessToken', data.accessToken);
                 localStorage.setItem('tokenType', data.tokenType);
-                alert('로그인 성공!');
-                // Navigate to dashboard or home page if needed
-                // window.location.href = '/'; 
+                // alert('로그인 성공!'); // Removing alert for smoother UX
+                navigate('/dashboard');
             } else {
                 throw new Error('토큰을 받아오지 못했습니다.');
             }

@@ -24,7 +24,10 @@ const Sidebar = ({ isOpen, onClose }) => {
 
             <div className="app-brand desktop-brand">Personal Life</div>
 
-            <button className="new-entry-btn">
+            <button className="new-entry-btn" onClick={() => {
+                navigate('/service/integration');
+                onClose && onClose();
+            }}>
                 <span>+ New Service</span>
             </button>
 
@@ -40,11 +43,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                     <span>Home</span>
                 </NavLink>
 
-                <div className="nav-label" style={{ marginTop: '20px' }}>Recent Entries</div>
-                <div className="nav-item">
-                    <FaEdit className="nav-icon" />
-                    <span>Daily Journal</span>
-                </div>
+                <div className="nav-label" style={{ marginTop: '20px' }}>Services</div>
                 <NavLink
                     to="/dashboard/project"
                     className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
@@ -53,10 +52,6 @@ const Sidebar = ({ isOpen, onClose }) => {
                     <FaCode className="nav-icon" />
                     <span>Project Manage</span>
                 </NavLink>
-                <div className="nav-item">
-                    <FaImage className="nav-icon" />
-                    <span>Design Assets</span>
-                </div>
             </div>
 
             <div className="user-section">

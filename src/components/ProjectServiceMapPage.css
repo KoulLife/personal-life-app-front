@@ -52,6 +52,7 @@
     font-size: 32px;
     font-weight: 700;
     background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+    background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     margin: 0;
@@ -290,7 +291,156 @@
 
 .panel-body {
     display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.panel-section {
+    display: flex;
+    flex-direction: column;
     gap: 10px;
+}
+
+.section-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.4);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.display-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 0 16px;
+    height: 42px;
+    box-sizing: border-box;
+}
+
+.display-label {
+    font-size: 14px;
+    color: white;
+    font-weight: 600;
+}
+
+.edit-row,
+.create-row {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+}
+
+.icon-btn {
+    width: 42px;
+    /* Match height of input approx */
+    height: 42px;
+    border-radius: 10px;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.save-btn {
+    background: rgba(110, 142, 251, 0.2);
+    color: #6e8efb;
+    border: 1px solid rgba(110, 142, 251, 0.3);
+}
+
+.save-btn:hover {
+    background: #6e8efb;
+    color: white;
+}
+
+.edit-btn {
+    background: transparent;
+    color: rgba(255, 255, 255, 0.5);
+    border: none;
+    width: 30px;
+    height: 30px;
+}
+
+.edit-btn:hover {
+    color: #6e8efb;
+    background: rgba(110, 142, 251, 0.1);
+}
+
+.cancel-btn {
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.cancel-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+}
+
+.action-row {
+    display: flex;
+    gap: 10px;
+}
+
+.action-btn {
+    flex: 1;
+    padding: 8px;
+    border-radius: 8px;
+    border: none;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.2s;
+}
+
+.btn-complete {
+    background: rgba(75, 206, 151, 0.1);
+    color: #4bce97;
+    border: 1px solid rgba(75, 206, 151, 0.2);
+}
+
+.btn-complete:hover {
+    background: #4bce97;
+    color: #000;
+}
+
+.btn-undo {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-undo:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+.btn-delete {
+    background: rgba(255, 107, 107, 0.1);
+    color: #ff6b6b;
+    border: 1px solid rgba(255, 107, 107, 0.2);
+}
+
+.btn-delete:hover {
+    background: #ff6b6b;
+    color: white;
+}
+
+.panel-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    width: 100%;
 }
 
 .creation-input {
@@ -298,7 +448,9 @@
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 10px;
-    padding: 12px 16px;
+    padding: 0 16px;
+    height: 42px;
+    box-sizing: border-box;
     color: white;
     font-size: 14px;
     outline: none;

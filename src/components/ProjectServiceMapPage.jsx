@@ -16,7 +16,7 @@ import ReactFlow, {
 import dagre from 'dagre';
 import 'reactflow/dist/style.css';
 import './ProjectServiceMapPage.css';
-import { FaArrowLeft, FaCheckCircle, FaCube, FaPlus, FaSave, FaTimes, FaLink } from 'react-icons/fa';
+import { FaArrowLeft, FaCheckCircle, FaCube, FaPlus, FaSave, FaTimes, FaLink, FaTrash, FaPen, FaUndo, FaCheck } from 'react-icons/fa';
 
 const dagreGraph = new dagre.graphlib.Graph();
 dagreGraph.setDefaultEdgeLabel(() => ({}));
@@ -93,10 +93,12 @@ const ProjectServiceMapPage = () => {
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
-    // Creation State
+    // Creation & Edit State
     const [selectedNode, setSelectedNode] = useState(null);
     const [newProjectContent, setNewProjectContent] = useState('');
-    const [isCreating, setIsCreating] = useState(false);
+    const [editContent, setEditContent] = useState('');
+    const [isPanelOpen, setIsPanelOpen] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
 
     // Register Custom Node
     const nodeTypes = useMemo(() => ({ custom: CustomNode }), []);
@@ -181,12 +183,14 @@ const ProjectServiceMapPage = () => {
 
     const onNodeClick = useCallback((event, node) => {
         setSelectedNode(node);
-        setIsCreating(true); // Open panel on click
+        setEditContent(node.data.label); // Init edit content
+        setIsPanelOpen(true); // Open panel on click
+        setIsEditing(false); // Reset edit mode
     }, []);
 
     const onPaneClick = useCallback(() => {
         setSelectedNode(null);
-        setIsCreating(false); // Close panel when clicking on pane
+        setIsPanelOpen(false); // Close panel when clicking on pane
     }, []);
 
     const handleCreateProject = async () => {
@@ -211,14 +215,74 @@ const ProjectServiceMapPage = () => {
 
             if (response.ok) {
                 setNewProjectContent('');
-                setSelectedNode(null); // Clear selected node after creation
-                setIsCreating(false); // Close panel after creation
-                fetchData(); // Refresh graph
+                // Keep panel open to show connection? Or close? User might want to add more.
+                // But typically we refresh graph.
+                fetchData();
             } else {
                 console.error('Failed to create project');
             }
         } catch (error) {
             console.error('Error creating project:', error);
+        }
+    };
+
+    const handleEditProject = async () => {
+        if (!selectedNode || !editContent.trim()) return;
+        try {
+            const token = localStorage.getItem('accessToken');
+            await fetch(`${process.env.REACT_APP_API_URL}/project/${selectedNode.id}`, {
+                method: 'PATCH',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'text/plain'
+                },
+                body: editContent
+            });
+            fetchData(); // Refresh to show new name
+            setIsEditing(false); // Turn off edit mode
+        } catch (error) {
+            console.error('Error updating project:', error);
+        }
+    };
+
+    const handleDeleteProject = async () => {
+        if (!selectedNode || !window.confirm('Are you sure you want to delete this project?')) return;
+        try {
+            const token = localStorage.getItem('accessToken');
+            await fetch(`${process.env.REACT_APP_API_URL}/project/${selectedNode.id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            setSelectedNode(null);
+            setIsPanelOpen(false);
+            fetchData();
+        } catch (error) {
+            console.error('Error deleting project:', error);
+        }
+    };
+
+    const handleToggleStatus = async () => {
+        if (!selectedNode) return;
+        const isDone = selectedNode.data.status === 'DONE';
+        const endpoint = isDone ? 'undo-complete' : 'complete';
+
+        try {
+            const token = localStorage.getItem('accessToken');
+            await fetch(`${process.env.REACT_APP_API_URL}/project/${selectedNode.id}/${endpoint}`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            // Updating local state immediately for better UX before fetch?
+            // Or just fetch. Let's fetch for consistency.
+            fetchData();
+            // Update selected node status locally so UI reflects it immediately if we don't close panel
+            setSelectedNode(prev => ({
+                ...prev,
+                data: { ...prev.data, status: isDone ? 'IN_PROGRESS' : 'DONE' }
+            }));
+        } catch (error) {
+            console.error('Error toggling status:', error);
         }
     };
 
@@ -261,28 +325,93 @@ const ProjectServiceMapPage = () => {
                 />
             </ReactFlow>
 
-            {/* Creation Panel */}
-            <div className={`creation-panel ${isCreating ? 'panel-active' : ''}`}>
+            {/* Detail & Global Creation Panel */}
+            <div className={`creation-panel ${isPanelOpen ? 'panel-active' : ''}`}>
                 <div className="panel-header">
                     <span className="panel-label">
-                        {selectedNode ? <><FaLink /> Linked to: <strong>{selectedNode.data.label}</strong></> : <><FaPlus /> New Root Project</>}
+                        {selectedNode ? <><FaLink /> Project Details</> : <><FaPlus /> New Root Project</>}
                     </span>
-                    {isCreating &&
-                        <button className="panel-close-btn" onClick={() => { setSelectedNode(null); setIsCreating(false); setNewProjectContent(''); }}><FaTimes /></button>
+                    {isPanelOpen &&
+                        <button className="panel-close-btn" onClick={() => { setSelectedNode(null); setIsPanelOpen(false); setNewProjectContent(''); }}><FaTimes /></button>
                     }
                 </div>
+
                 <div className="panel-body">
-                    <input
-                        type="text"
-                        className="creation-input"
-                        placeholder="Enter project name..."
-                        value={newProjectContent}
-                        onChange={(e) => setNewProjectContent(e.target.value)}
-                        onKeyDown={(e) => e.key === 'Enter' && handleCreateProject()}
-                    />
-                    <button className="creation-submit-btn" onClick={handleCreateProject}>
-                        <FaSave /> Save
-                    </button>
+                    {selectedNode ? (
+                        <>
+                            {/* Section 1: Manage Selected Node */}
+                            <div className="panel-section">
+                                <div className="section-title">Selected Project</div>
+
+                                {isEditing ? (
+                                    <div className="edit-row">
+                                        <input
+                                            type="text"
+                                            className="creation-input"
+                                            value={editContent}
+                                            onChange={(e) => setEditContent(e.target.value)}
+                                            onKeyDown={(e) => e.key === 'Enter' && handleEditProject()}
+                                            autoFocus
+                                        />
+                                        <button className="icon-btn save-btn" onClick={handleEditProject} title="Save Name"><FaSave /></button>
+                                        <button className="icon-btn cancel-btn" onClick={() => setIsEditing(false)} title="Cancel"><FaTimes /></button>
+                                    </div>
+                                ) : (
+                                    <div className="display-row">
+                                        <span className="display-label">{selectedNode.data.label}</span>
+                                        <button className="icon-btn edit-btn" onClick={() => setIsEditing(true)} title="Edit Name"><FaPen /></button>
+                                    </div>
+                                )}
+
+                                <div className="action-row">
+                                    <button
+                                        className={`action-btn ${selectedNode.data.status === 'DONE' ? 'btn-undo' : 'btn-complete'}`}
+                                        onClick={handleToggleStatus}
+                                    >
+                                        {selectedNode.data.status === 'DONE' ? <><FaUndo /> Undo Complete</> : <><FaCheck /> Complete</>}
+                                    </button>
+                                    <button className="action-btn btn-delete" onClick={handleDeleteProject}>
+                                        <FaTrash /> Delete
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="panel-divider"></div>
+
+                            {/* Section 2: Create Next Step */}
+                            <div className="panel-section">
+                                <div className="section-title">Create Next Step</div>
+                                <div className="create-row">
+                                    <input
+                                        type="text"
+                                        className="creation-input"
+                                        placeholder="Next project name..."
+                                        value={newProjectContent}
+                                        onChange={(e) => setNewProjectContent(e.target.value)}
+                                        onKeyDown={(e) => e.key === 'Enter' && handleCreateProject()}
+                                    />
+                                    <button className="creation-submit-btn" onClick={handleCreateProject}>
+                                        <FaPlus /> Add
+                                    </button>
+                                </div>
+                            </div>
+                        </>
+                    ) : (
+                        /* Root Creation Mode */
+                        <div className="create-row">
+                            <input
+                                type="text"
+                                className="creation-input"
+                                placeholder="Root project name..."
+                                value={newProjectContent}
+                                onChange={(e) => setNewProjectContent(e.target.value)}
+                                onKeyDown={(e) => e.key === 'Enter' && handleCreateProject()}
+                            />
+                            <button className="creation-submit-btn" onClick={handleCreateProject}>
+                                <FaPlus /> Create
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

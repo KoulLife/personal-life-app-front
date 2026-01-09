@@ -190,10 +190,10 @@
     font-weight: bold;
 }
 
-/* Gantt Chart Mockup */
+/* Gantt Chart Mockup - REFACTORED TO LIST VIEW */
 .gantt-chart {
-    display: grid;
-    grid-template-columns: 250px 1fr;
+    display: flex;
+    flex-direction: column;
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 8px;
     overflow: hidden;
@@ -201,72 +201,227 @@
 }
 
 .chart-header {
-    display: contents;
+    display: flex;
+    width: 100%;
 }
 
 .header-cell {
-    padding: 12px;
+    padding: 12px 20px;
     background: rgba(255, 255, 255, 0.05);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     font-size: 12px;
     font-weight: 600;
     color: rgba(255, 255, 255, 0.7);
+    white-space: nowrap;
+    width: 100%;
+    text-align: left;
 }
 
 .timeline-months {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    display: none;
+    /* Hidden as per request */
 }
 
-.month-cell {
-    padding: 12px;
-    text-align: center;
-    border-right: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-/* Task Rows */
+/* Task Row - Grid Alignment */
 .task-row {
-    display: contents;
-}
-
-.task-info {
-    padding: 10px 15px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    border-right: 1px solid rgba(255, 255, 255, 0.1);
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    width: 100%;
     position: relative;
+    /* For progress bar positioning */
+}
+
+/* The Left Cell (Info) - Now the main container */
+.task-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+    /* Increased padding */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-right: none;
+    /* Removed border */
+    position: relative;
+    z-index: 2;
+}
+
+.task-row:hover .task-info {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.task-left-group,
+.subtask-left-group {
+    display: flex;
+    align-items: flex-start;
+    /* Align checkbox to top */
+    padding-top: 4px;
+    /* Slight padding */
+    gap: 10px;
+    flex: 1;
+}
+
+.subtask-text-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-left: 12px;
+}
+
+.subtask-metadata {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 500;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.meta-item.overdue {
+    color: #ff6b6b;
+}
+
+.task-right-group,
+.subtask-right-group {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    min-width: 70px;
+}
+
+/* Icons & Title */
+.chevron-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    color: rgba(255, 255, 255, 0.4);
+    transition: all 0.2s;
+    border-radius: 4px;
+}
+
+.chevron-wrapper:hover {
+    color: white;
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .task-title-wrapper {
     display: flex;
     align-items: center;
+    gap: 8px;
     cursor: pointer;
-}
-
-.expand-icon {
-    font-size: 10px;
-    margin-right: 8px;
-    color: rgba(255, 255, 255, 0.5);
-    transition: color 0.2s;
-}
-
-.task-title-wrapper:hover .expand-icon {
-    color: white;
 }
 
 .task-title {
     font-size: 13px;
+    /* Smaller parent font */
     font-weight: 500;
+    color: rgba(255, 255, 255, 0.95);
+    letter-spacing: 0.2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    /* Ensure ellipsis works */
+    max-width: 180px;
+    /* Limit width to trigger ellipsis before badge interaction */
 }
 
-.task-status {
-    font-size: 10px;
-    align-self: flex-start;
-    margin-left: 18px;
-    /* Align with text after chevron */
+/* Premium Status Badge - Minimal Outline */
+.task-status-badge {
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 18px;
+    transition: all 0.3s;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.task-status-badge.status-done {
+    color: #4bce97;
+    border-color: rgba(75, 206, 151, 0.4);
+    background: rgba(75, 206, 151, 0.05);
+}
+
+.task-status-badge.status-todo,
+.task-status-badge.status-in_progress {
+    color: #7367f0;
+    border-color: rgba(115, 103, 240, 0.4);
+    background: rgba(115, 103, 240, 0.05);
+}
+
+/* Custom Checkbox - Smaller & Trendy */
+.custom-checkbox {
+    width: 18px;
+    /* Reduced from 24px */
+    height: 18px;
+    border: 1.5px solid rgba(255, 255, 255, 0.3);
+    /* Thinner border */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    /* Bouncy transition */
+    background: transparent;
+    color: transparent;
+    flex-shrink: 0;
+}
+
+.custom-checkbox:hover {
+    border-color: #6e8efb;
+    background: rgba(110, 142, 251, 0.05);
+}
+
+.custom-checkbox.checked {
+    background: #4bce97;
+    border-color: #4bce97;
+    color: white;
+    transform: scale(1.05);
+    box-shadow: 0 0 10px rgba(75, 206, 151, 0.3);
+}
+
+/* Subtask Title Polish - Smaller */
+.subtask-title {
+    font-size: 12px;
+    /* Reduced from 14/13 */
+    color: rgba(255, 255, 255, 0.8);
+    transition: all 0.2s;
+    font-weight: 400;
+}
+
+.subtask-title.completed {
+    color: rgba(255, 255, 255, 0.3);
+    text-decoration: line-through;
+}
+
+/* Subtask Row Spacing */
+.nested-row .task-info {
+    padding: 8px 12px 8px 38px;
+    /* Indent via padding */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+/* Detail Button - Refined positioning */
+.detail-btn {
+    /* No margins needed if using gap in flex container */
+    margin: 0;
 }
 
 /* Detail Button */
@@ -305,9 +460,51 @@
     background: rgba(255, 255, 255, 0.02);
 }
 
-.nested-row .timeline-track {
-    background: rgba(255, 255, 255, 0.02);
+/* Beautiful Inline Progress Bar */
+.inline-progress-container {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* Cover full background but will be subtle */
+    pointer-events: none;
+    /* Let clicks pass through */
+    overflow: hidden;
+    z-index: 1;
 }
+
+.inline-progress-bar {
+    height: 100%;
+    width: 0%;
+    /* Dynamic */
+    transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 0.15;
+    /* Very subtle background fill */
+}
+
+/* Bottom thin line indicator */
+.inline-progress-line {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    /* Thin line at bottom */
+    width: 0%;
+    /* Dynamic */
+    transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 3;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Percentage text style - if needed */
+.progress-text {
+    font-size: 10px;
+    font-weight: 700;
+    margin-left: 8px;
+    opacity: 0.7;
+}
+
 
 .status-done {
     background: #4bce97;
@@ -341,6 +538,87 @@
 
 .timeline-bar:hover {
     filter: brightness(1.2);
+}
+
+/* New Task Input - Premium UI */
+.task-creation-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 8px 0;
+    width: 100%;
+    max-width: 400px;
+}
+
+.new-task-input {
+    background: rgba(255, 255, 255, 0.05);
+    /* Subtle fill */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    color: white;
+    font-size: 13px;
+    padding: 10px 12px;
+    width: 100%;
+    outline: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.new-task-input:focus {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: #6e8efb;
+    box-shadow: 0 4px 12px rgba(110, 142, 251, 0.15);
+    transform: translateY(-1px);
+}
+
+.new-task-input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+    font-style: normal;
+}
+
+.creation-actions {
+    display: flex;
+    gap: 8px;
+    margin-left: 2px;
+}
+
+.btn-add {
+    padding: 6px 16px;
+    background: linear-gradient(135deg, #6e8efb, #a777e3);
+    border: none;
+    border-radius: 6px;
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s;
+}
+
+.btn-add:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(110, 142, 251, 0.3);
+}
+
+.btn-add:active {
+    transform: translateY(0);
+}
+
+.btn-cancel {
+    padding: 6px 12px;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-cancel:hover {
+    color: white;
+    background: rgba(255, 255, 255, 0.05);
 }
 
 /* Mobile Responsive */

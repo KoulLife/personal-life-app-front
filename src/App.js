@@ -9,28 +9,40 @@ import ProjectManagePage from './components/ProjectManagePage';
 import './App.css';
 
 import ProjectServiceMapPage from './components/ProjectServiceMapPage';
+import ServiceIntegrationPage from './components/ServiceIntegrationPage';
+import { ServiceProvider } from './contexts/ServiceContext';
 
 function App() {
   return (
-    <Router>
-      <div className="App">
-        <Routes>
-          <Route path="/" element={<Navigate to="/login" replace />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/signup" element={<SignupPage />} />
+    <ServiceProvider>
+      <Router>
+        <div className="App">
+          <Routes>
+            <Route path="/" element={<Navigate to="/login" replace />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignupPage />} />
 
-          {/* Protected Dashboard Routes */}
-          <Route path="/dashboard" element={<ProtectedRoute />}>
-            <Route element={<MainLayout />}>
-              <Route index element={<DashboardHome />} />
-              <Route path="project" element={<ProjectManagePage />} />
-              <Route path="project-group/:groupId" element={<ProjectServiceMapPage />} />
-              {/* Future routes can be added here */}
+            {/* Protected Dashboard Routes */}
+            <Route path="/dashboard" element={<ProtectedRoute />}>
+              <Route element={<MainLayout />}>
+                <Route index element={<DashboardHome />} />
+                <Route path="project" element={<ProjectManagePage />} />
+                <Route path="project-group/:groupId" element={<ProjectServiceMapPage />} />
+                <Route path="service/integration" element={<ServiceIntegrationPage />} />
+                {/* Future routes can be added here */}
+              </Route>
             </Route>
-          </Route>
-        </Routes>
-      </div>
-    </Router>
+
+            {/* Service Integration Route */}
+            {/* <Route path="/service/integration" element={
+            <ProtectedRoute>
+              <ServiceIntegrationPage />
+            </ProtectedRoute>
+          } /> */ }
+          </Routes>
+        </div>
+      </Router>
+    </ServiceProvider>
   );
 }
 

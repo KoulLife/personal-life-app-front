@@ -1,9 +1,11 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { FaHome, FaEdit, FaCode, FaImage, FaCog, FaSignOutAlt, FaTimes } from 'react-icons/fa';
+import { FaHome, FaEdit, FaCode, FaImage, FaCog, FaSignOutAlt, FaTimes, FaBolt, FaBell, FaWallet } from 'react-icons/fa';
+import { useServices } from '../contexts/ServiceContext';
 
 const Sidebar = ({ isOpen, onClose }) => {
     const navigate = useNavigate();
+    const { activeServices } = useServices();
 
     const handleLogout = () => {
         if (window.confirm('로그아웃 하시겠습니까?')) {
@@ -24,12 +26,15 @@ const Sidebar = ({ isOpen, onClose }) => {
 
             <div className="app-brand desktop-brand">Personal Life</div>
 
-            <button className="new-entry-btn">
+            <button className="new-entry-btn" onClick={() => {
+                navigate('/dashboard/service/integration');
+                onClose && onClose();
+            }}>
                 <span>+ New Service</span>
             </button>
 
             <div className="nav-section">
-                <div className="nav-label">Main</div>
+                <div className="nav-label">Menu</div>
                 <NavLink
                     to="/dashboard"
                     end
@@ -40,23 +45,37 @@ const Sidebar = ({ isOpen, onClose }) => {
                     <span>Home</span>
                 </NavLink>
 
-                <div className="nav-label" style={{ marginTop: '20px' }}>Recent Entries</div>
-                <div className="nav-item">
-                    <FaEdit className="nav-icon" />
-                    <span>Daily Journal</span>
-                </div>
-                <NavLink
-                    to="/dashboard/project"
-                    className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
-                    onClick={onClose}
-                >
-                    <FaCode className="nav-icon" />
-                    <span>Project Manage</span>
-                </NavLink>
-                <div className="nav-item">
-                    <FaImage className="nav-icon" />
-                    <span>Design Assets</span>
-                </div>
+                {activeServices.includes('PROJECT_MANAGER') && (
+                    <NavLink
+                        to="/dashboard/project"
+                        className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+                        onClick={onClose}
+                    >
+                        <FaCode className="nav-icon" />
+                        <span>Project Manager</span>
+                    </NavLink>
+                )}
+
+                {activeServices.includes('REALTIME_WORKFLOW') && (
+                    <div className="nav-item" onClick={onClose}>
+                        <FaBolt className="nav-icon" />
+                        <span>Real-time Workflow</span>
+                    </div>
+                )}
+
+                {activeServices.includes('ALERT_MANAGER') && (
+                    <div className="nav-item" onClick={onClose}>
+                        <FaBell className="nav-icon" />
+                        <span>Alert Manager</span>
+                    </div>
+                )}
+
+                {activeServices.includes('FINANCIAL_MANAGER') && (
+                    <div className="nav-item" onClick={onClose}>
+                        <FaWallet className="nav-icon" />
+                        <span>Financial Manager</span>
+                    </div>
+                )}
             </div>
 
             <div className="user-section">

@@ -4,6 +4,7 @@ import './ProjectManagePage.css';
 import { FaBolt, FaList, FaColumns, FaCode, FaShareAlt, FaChevronRight, FaChevronDown, FaPlus, FaArrowRight, FaCheck, FaCodeBranch, FaRegCalendarAlt, FaPen, FaTrash } from 'react-icons/fa';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
+import AiChatWidget from './AiChatWidget';
 
 const ProjectManagePage = () => {
     const navigate = useNavigate();
@@ -698,6 +699,8 @@ const ProjectManagePage = () => {
 
                 </div>
             </div>
+
+            <AiChatWidget />
         </div >
     );
 };

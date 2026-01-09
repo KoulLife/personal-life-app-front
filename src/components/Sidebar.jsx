@@ -1,9 +1,11 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { FaHome, FaEdit, FaCode, FaImage, FaCog, FaSignOutAlt, FaTimes } from 'react-icons/fa';
+import { FaHome, FaEdit, FaCode, FaImage, FaCog, FaSignOutAlt, FaTimes, FaBolt, FaBell, FaWallet } from 'react-icons/fa';
+import { useServices } from '../contexts/ServiceContext';
 
 const Sidebar = ({ isOpen, onClose }) => {
     const navigate = useNavigate();
+    const { activeServices } = useServices();
 
     const handleLogout = () => {
         if (window.confirm('로그아웃 하시겠습니까?')) {
@@ -25,7 +27,7 @@ const Sidebar = ({ isOpen, onClose }) => {
             <div className="app-brand desktop-brand">Personal Life</div>
 
             <button className="new-entry-btn" onClick={() => {
-                navigate('/service/integration');
+                navigate('/dashboard/service/integration');
                 onClose && onClose();
             }}>
                 <span>+ New Service</span>
@@ -44,14 +46,38 @@ const Sidebar = ({ isOpen, onClose }) => {
                 </NavLink>
 
                 <div className="nav-label" style={{ marginTop: '20px' }}>Services</div>
-                <NavLink
-                    to="/dashboard/project"
-                    className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
-                    onClick={onClose}
-                >
-                    <FaCode className="nav-icon" />
-                    <span>Project Manage</span>
-                </NavLink>
+
+                {activeServices.includes('PROJECT_MANAGER') && (
+                    <NavLink
+                        to="/dashboard/project"
+                        className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+                        onClick={onClose}
+                    >
+                        <FaCode className="nav-icon" />
+                        <span>Project Manager</span>
+                    </NavLink>
+                )}
+
+                {activeServices.includes('REALTIME_WORKFLOW') && (
+                    <div className="nav-item" onClick={onClose}>
+                        <FaBolt className="nav-icon" />
+                        <span>Real-time Workflow</span>
+                    </div>
+                )}
+
+                {activeServices.includes('ALERT_MANAGER') && (
+                    <div className="nav-item" onClick={onClose}>
+                        <FaBell className="nav-icon" />
+                        <span>Alert Manager</span>
+                    </div>
+                )}
+
+                {activeServices.includes('FINANCIAL_MANAGER') && (
+                    <div className="nav-item" onClick={onClose}>
+                        <FaWallet className="nav-icon" />
+                        <span>Financial Manager</span>
+                    </div>
+                )}
             </div>
 
             <div className="user-section">

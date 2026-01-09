@@ -241,16 +241,36 @@ const ProjectManagePage = () => {
         const newStatus = currentStatus === 'DONE' ? 'TODO' : 'DONE';
         const isComplete = newStatus === 'DONE';
 
-        // Optimistic Update
-        setTasks(prev => prev.map(t => {
+        // Optimistic Update - Ensure deep clone/update to trigger re-render
+        setTasks(prevTasks => prevTasks.map(t => {
             if (t.id === parentId) {
+                // Update specific subtask
+                const updatedSubtasks = t.subtasks.map(s => {
+                    if (s.id === subtaskId) {
+                        return {
+                            ...s,
+                            status: newStatus,
+                            statusClass: isComplete ? 'status-done' : 'status-todo'
+                        };
+                    }
+                    return s;
+                });
+
+                // Recalculate parent progress
+                // We assume subtasks array contains all tasks for accurate calculation
+                const total = updatedSubtasks.length;
+                const completedCount = updatedSubtasks.filter(s => s.status === 'DONE').length;
+                const percentage = total === 0 ? 0 : Math.round((completedCount / total) * 100);
+
                 return {
                     ...t,
-                    subtasks: t.subtasks.map(s =>
-                        s.id === subtaskId
-                            ? { ...s, status: newStatus, statusClass: isComplete ? 'status-done' : 'status-todo' }
-                            : s
-                    )
+                    subtasks: updatedSubtasks,
+                    // Update parent stats and timeline for immediate feedback
+                    completedProjectCount: completedCount, // Update internal counter if used elsewhere
+                    timeline: {
+                        width: `${percentage}%`,
+                        background: getProgressColor(percentage)
+                    }
                 };
             }
             return t;
@@ -258,19 +278,18 @@ const ProjectManagePage = () => {
 
         try {
             const token = localStorage.getItem('accessToken');
-            await fetch(`${process.env.REACT_APP_API_URL}/project`, {
-                method: 'PATCH',
+            const endpoint = isComplete ? 'complete' : 'undo-complete';
+
+            await fetch(`${process.env.REACT_APP_API_URL}/project/${subtaskId}/${endpoint}`, {
+                method: 'POST', // Changed to POST as per controller
                 headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    projectId: subtaskId,
-                    completeStatus: isComplete
-                })
+                    'Authorization': `Bearer ${token}`
+                    // Content-Type not strictly needed for empty body POST, but good practice if body added later
+                }
             });
         } catch (error) {
             console.error('Error updating status:', error);
+            // Could add revert logic here if needed
         }
     };
 
@@ -485,8 +504,12 @@ const ProjectManagePage = () => {
                                 {task.expanded && (
                                     <>
                                         {task.subtasks.map(subtask => (
-                                            <div className="nested-row" key={subtask.id} style={{ display: 'flex', flexDirection: 'column', position: 'relative' }}>
-                                                <div className="task-info" style={{ paddingLeft: '40px', borderTop: 'none' }}>
+                                            <div
+                                                className={`nested-row ${subtask.status === 'DONE' ? 'completed-row' : ''}`}
+                                                key={subtask.id}
+                                                style={{ display: 'flex', flexDirection: 'column', position: 'relative' }}
+                                            >
+                                                <div className="task-info" style={{ paddingLeft: '40px', borderTop: 'none', background: 'transparent' }}>
                                                     <div className="subtask-left-group">
                                                         <div
                                                             className={`custom-checkbox ${subtask.status === 'DONE' ? 'checked' : ''}`}
@@ -510,7 +533,7 @@ const ProjectManagePage = () => {
                                                                 />
                                                             ) : (
                                                                 <div className="subtask-title-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-                                                                    <div className="subtask-title">
+                                                                    <div className={`subtask-title ${subtask.status === 'DONE' ? 'completed' : ''}`}>
                                                                         {subtask.title}
                                                                     </div>
                                                                     <div className="task-actions">
@@ -533,15 +556,7 @@ const ProjectManagePage = () => {
                                                         </div>
                                                     </div>
                                                 </div>
-                                                {/* Subtask Progress - simplified, full visual feedback */}
-                                                <div className="inline-progress-line"
-                                                    style={{
-                                                        width: subtask.timeline.width,
-                                                        background: subtask.timeline.background,
-                                                        height: '1px',
-                                                        opacity: 0.5
-                                                    }}
-                                                ></div>
+                                                {/* Removed inline-progress-line for cleaner look */}
                                             </div>
                                         ))}
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './ProjectManagePage.css';
-import { FaBolt, FaList, FaColumns, FaCode, FaShareAlt, FaChevronRight, FaChevronDown, FaPlus, FaArrowRight, FaCheck, FaCodeBranch, FaRegCalendarAlt } from 'react-icons/fa';
+import { FaBolt, FaList, FaColumns, FaCode, FaShareAlt, FaChevronRight, FaChevronDown, FaPlus, FaArrowRight, FaCheck, FaCodeBranch, FaRegCalendarAlt, FaPen, FaTrash } from 'react-icons/fa';
 
 const ProjectManagePage = () => {
     const navigate = useNavigate();
@@ -11,6 +11,10 @@ const ProjectManagePage = () => {
     const [activeInputProjectId, setActiveInputProjectId] = useState(null);
     const [newTaskTitle, setNewTaskTitle] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // Edit State
+    const [editingTaskId, setEditingTaskId] = useState(null);
+    const [editContent, setEditContent] = useState('');
 
     const fetchProjectGroups = async () => {
         try {
@@ -270,6 +274,84 @@ const ProjectManagePage = () => {
         }
     };
 
+    const handleDeleteProject = async (projectId, parentId) => {
+        if (!window.confirm('Are you sure you want to delete this task?')) return;
+
+        // Optimistic update
+        setTasks(prev => prev.map(t => {
+            if (t.id === parentId) {
+                return {
+                    ...t,
+                    subtasks: t.subtasks.filter(s => s.id !== projectId)
+                };
+            }
+            return t;
+        }));
+
+        try {
+            const token = localStorage.getItem('accessToken');
+            await fetch(`${process.env.REACT_APP_API_URL}/project/${projectId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+        } catch (error) {
+            console.error('Error deleting project:', error);
+            alert('Failed to delete project');
+            fetchProjectGroups(); // Revert on error
+        }
+    };
+
+    const handleEditClick = (task, e) => {
+        e.stopPropagation();
+        setEditingTaskId(task.id);
+        setEditContent(task.title);
+    };
+
+    const submitEditTask = async (projectId, parentId) => {
+        if (!editContent.trim()) return;
+
+        // Optimistic update
+        setTasks(prev => prev.map(t => {
+            if (t.id === parentId) {
+                return {
+                    ...t,
+                    subtasks: t.subtasks.map(s => s.id === projectId ? { ...s, title: editContent } : s)
+                };
+            }
+            return t;
+        }));
+
+        try {
+            const token = localStorage.getItem('accessToken');
+            // Sending raw string as requested by user
+            await fetch(`${process.env.REACT_APP_API_URL}/project/${projectId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'text/plain' // Sending string directly
+                },
+                body: editContent
+            });
+            setEditingTaskId(null);
+            setEditContent('');
+        } catch (error) {
+            console.error('Error updating project:', error);
+            alert('Failed to update project');
+        }
+    };
+
+    const handleEditKeyDown = (e, projectId, parentId) => {
+        if (e.nativeEvent.isComposing) return;
+        if (e.key === 'Enter') {
+            submitEditTask(projectId, parentId);
+        } else if (e.key === 'Escape') {
+            setEditingTaskId(null);
+            setEditContent('');
+        }
+    };
+
     return (
         <div className="project-manage-container">
             {/* Secondary Sidebar (Project specific) */}
@@ -415,10 +497,31 @@ const ProjectManagePage = () => {
                                                         >
                                                             {subtask.status === 'DONE' && <FaCheck size={12} />}
                                                         </div>
-                                                        <div className="subtask-text-content" style={{ display: 'flex', flexDirection: 'column', gap: '4px', paddingLeft: '12px' }}>
-                                                            <div className="subtask-title">
-                                                                {subtask.title}
-                                                            </div>
+                                                        <div className="subtask-text-content" style={{ display: 'flex', flexDirection: 'column', gap: '4px', paddingLeft: '12px', flex: 1 }}>
+                                                            {editingTaskId === subtask.id ? (
+                                                                <input
+                                                                    className="edit-task-input"
+                                                                    value={editContent}
+                                                                    onChange={(e) => setEditContent(e.target.value)}
+                                                                    onKeyDown={(e) => handleEditKeyDown(e, subtask.id, task.id)}
+                                                                    autoFocus
+                                                                    onBlur={() => submitEditTask(subtask.id, task.id)}
+                                                                    onClick={(e) => e.stopPropagation()}
+                                                                />
+                                                            ) : (
+                                                                <div className="subtask-title-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                                                                    <div className="subtask-title">
+                                                                        {subtask.title}
+                                                                    </div>
+                                                                    <div className="task-actions">
+                                                                        <FaPen className="action-icon edit-icon" onClick={(e) => handleEditClick(subtask, e)} />
+                                                                        <FaTrash className="action-icon delete-icon" onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            handleDeleteProject(subtask.id, task.id);
+                                                                        }} />
+                                                                    </div>
+                                                                </div>
+                                                            )}
                                                             <div className="subtask-metadata" style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '11px', color: 'rgba(255,255,255,0.5)' }}>
                                                                 <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                                                                     <FaCodeBranch size={10} /> 3/5

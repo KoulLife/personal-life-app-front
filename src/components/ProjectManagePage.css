@@ -621,6 +621,53 @@
     background: rgba(255, 255, 255, 0.05);
 }
 
+/* Edit & Delete Actions (Hover only) */
+.subtask-title-row:hover .task-actions {
+    opacity: 1;
+}
+
+.task-actions {
+    display: flex;
+    gap: 8px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    margin-right: 8px;
+}
+
+.action-icon {
+    font-size: 12px;
+    cursor: pointer;
+    color: rgba(255, 255, 255, 0.4);
+    transition: color 0.2s;
+    padding: 4px;
+    border-radius: 4px;
+}
+
+.action-icon:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.action-icon.edit-icon:hover {
+    color: #6e8efb;
+}
+
+.action-icon.delete-icon:hover {
+    color: #ff6b6b;
+}
+
+/* Edit Input */
+.edit-task-input {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(110, 142, 251, 0.5);
+    color: white;
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    outline: none;
+    width: 100%;
+    box-shadow: 0 0 0 2px rgba(110, 142, 251, 0.2);
+}
+
 /* Mobile Responsive */
 @media (max-width: 768px) {
     .project-manage-container {

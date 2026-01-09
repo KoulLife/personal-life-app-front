@@ -1,0 +1,343 @@
+/* ProjectServiceMapPage.css */
+
+.service-map-container {
+    width: 100%;
+    height: 100vh;
+    background: radial-gradient(circle at center, #1a1a2e 0%, #0a0a14 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Header Styling */
+.map-header {
+    position: absolute;
+    top: 30px;
+    left: 40px;
+    z-index: 10;
+    color: white;
+    pointer-events: none;
+    /* Let clicks pass through if needed, but buttons need pointer-events auto */
+}
+
+.map-back-btn {
+    pointer-events: auto;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.6);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+}
+
+.map-back-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    transform: translateX(-3px);
+}
+
+.map-title-group {
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.map-title-group h1 {
+    font-size: 32px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin: 0;
+    text-shadow: 0 0 30px rgba(165, 180, 252, 0.3);
+}
+
+.map-badge {
+    background: rgba(110, 142, 251, 0.2);
+    color: #818cf8;
+    border: 1px solid rgba(110, 142, 251, 0.3);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+/* CUSTOM NODE STYLES - The Trendy Part */
+.custom-node-shell {
+    width: 220px;
+    height: 80px;
+    background: rgba(30, 30, 45, 0.7);
+    /* Lighter background for better contrast */
+    backdrop-filter: blur(16px);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    /* More visible border */
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+    /* Deeper shadow for lift */
+    overflow: hidden;
+}
+
+.custom-node-shell:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8), 0 0 25px rgba(110, 142, 251, 0.3);
+    border-color: rgba(255, 255, 255, 0.3);
+    background: rgba(40, 40, 60, 0.85);
+    /* Exaggerated hover state brightness */
+}
+
+.node-content {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    position: relative;
+    z-index: 2;
+    width: 100%;
+}
+
+.node-icon-wrapper {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.node-icon {
+    font-size: 20px;
+}
+
+.node-text {
+    flex: 1;
+}
+
+.node-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 2px;
+}
+
+.node-sub {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.4);
+    font-family: monospace;
+}
+
+/* Status Specifics */
+.node-done {
+    border-left: 3px solid #4bce97;
+}
+
+.node-done .node-icon-wrapper {
+    background: rgba(75, 206, 151, 0.1);
+}
+
+.node-done .node-icon.done {
+    color: #4bce97;
+    filter: drop-shadow(0 0 5px rgba(75, 206, 151, 0.5));
+}
+
+.node-progress {
+    border-left: 3px solid #579dff;
+}
+
+.node-progress .node-icon-wrapper {
+    background: rgba(87, 157, 255, 0.1);
+}
+
+.node-progress .node-icon.progress {
+    color: #579dff;
+    filter: drop-shadow(0 0 5px rgba(87, 157, 255, 0.5));
+}
+
+/* Glossy Overlay */
+.gloss-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(105deg, transparent 40%, rgba(255, 255, 255, 0.03) 45%, rgba(255, 255, 255, 0.0) 50%);
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* Handles */
+.handle-custom {
+    width: 8px;
+    height: 8px;
+    background: #fff;
+    border: 2px solid #0a0a14;
+    transition: all 0.2s;
+}
+
+.custom-node-shell:hover .handle-custom {
+    background: #6e8efb;
+    width: 10px;
+    height: 10px;
+}
+
+/* React Flow Overrides */
+.react-flow__controls {
+    background: rgba(20, 20, 30, 0.8) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+}
+
+.react-flow__controls-button {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    fill: #aaa !important;
+}
+
+.react-flow__controls-button:hover {
+    fill: white !important;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Creation Panel */
+.creation-panel {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(150%);
+    width: 500px;
+    background: rgba(20, 20, 30, 0.85);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 20px;
+    z-index: 20;
+    transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.4s ease;
+    opacity: 0;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+}
+
+.creation-panel.panel-active {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+
+/* Also allow panel to be visible if focusing on creation even without selection (Root mode)? 
+   Currently js logic relies on selectedNode to toggle 'panel-active' CSS class 
+   OR needs another state. 
+   Ah, in JSX I used `selectedNode ? 'panel-active' : ''` but actually I should trigger it on `setIsCreating` or just always show it?
+   Wait, the Requirement is "Select node -> Save".
+   If I deselect, I might want to create Root.
+   Let's check JSX: `<div className={`creation-panel ${selectedNode ? 'panel-active' : ''}`}>`
+   Ideally, it should be active if user wants to create. 
+   Let's make it always visible as a "Command Center" or only when node selected?
+   For now, strictly following: "Node 연결 후 Save".
+   So only when node selected makes sense for "Linking".
+   But for "Root", we need a way.
+   Let's update JSX logic later if needed, but for now CSS handles .panel-active.
+*/
+/* Actually, let's make it show up always, or have a toggle button? 
+   No, let's stick to "Contextual". 
+   If user clicks background -> Deselect -> Panel hides? 
+   Then how to create root? 
+   Maybe we need a FAB (Floating Action Button) for "Add" that opens panel in Root mode.
+   For now, let's add .panel-active logic support.
+*/
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 13px;
+}
+
+.panel-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.panel-label strong {
+    color: #fff;
+    color: #4bce97;
+}
+
+.panel-close-btn {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+    font-size: 16px;
+    transition: color 0.2s;
+}
+
+.panel-close-btn:hover {
+    color: white;
+}
+
+.panel-body {
+    display: flex;
+    gap: 10px;
+}
+
+.creation-input {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 12px 16px;
+    color: white;
+    font-size: 14px;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.creation-input:focus {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: #6e8efb;
+    box-shadow: 0 0 15px rgba(110, 142, 251, 0.2);
+}
+
+.creation-submit-btn {
+    background: linear-gradient(135deg, #6e8efb 0%, #a777e3 100%);
+    border: none;
+    border-radius: 10px;
+    padding: 0 24px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+    box-shadow: 0 4px 15px rgba(110, 142, 251, 0.3);
+}
+
+.creation-submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(110, 142, 251, 0.4);
+}
+
+.creation-submit-btn:active {
+    transform: translateY(0);
+}
+
+/* Selected Node Highlight */
+.custom-node-shell.node-selected {
+    border-color: #a777e3;
+    box-shadow: 0 0 30px rgba(167, 119, 227, 0.4);
+    background: rgba(45, 40, 60, 0.9);
+}

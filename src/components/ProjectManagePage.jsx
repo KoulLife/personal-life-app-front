@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './ProjectManagePage.css';
-import { FaBolt, FaList, FaColumns, FaCode, FaShareAlt, FaChevronRight, FaChevronDown, FaPlus } from 'react-icons/fa';
+import { FaBolt, FaList, FaColumns, FaCode, FaShareAlt, FaChevronRight, FaChevronDown, FaPlus, FaArrowRight } from 'react-icons/fa';
 
 const ProjectManagePage = () => {
+    const navigate = useNavigate();
     // State for tasks
     const [tasks, setTasks] = useState([]);
 
@@ -210,6 +212,10 @@ const ProjectManagePage = () => {
                                         <div className="task-title-wrapper" onClick={() => toggleRow(task.id)}>
                                             {task.expanded ? <FaChevronDown className="expand-icon" /> : <FaChevronRight className="expand-icon" />}
                                             <div className="task-title"><FaBolt style={{ color: '#9d46ff' }} /> {task.title}</div>
+                                            <button className="detail-btn" onClick={(e) => {
+                                                e.stopPropagation();
+                                                navigate(`/dashboard/project-group/${task.id}`);
+                                            }}>Detail <FaArrowRight size={10} /></button>
                                         </div>
                                         <span className={`task-status ${task.statusClass}`}>{task.status}</span>
                                     </div>

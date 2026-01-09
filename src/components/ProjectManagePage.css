@@ -264,13 +264,40 @@
 
 .task-status {
     font-size: 10px;
-    margin-top: 4px;
-    padding: 2px 6px;
-    border-radius: 3px;
-    background: rgba(255, 255, 255, 0.1);
     align-self: flex-start;
     margin-left: 18px;
     /* Align with text after chevron */
+}
+
+/* Detail Button */
+.detail-btn {
+    margin-left: 12px;
+    padding: 4px 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    opacity: 0;
+    transform: translateX(-5px);
+}
+
+.task-title-wrapper:hover .detail-btn {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.detail-btn:hover {
+    background: linear-gradient(135deg, #6e8efb 0%, #a777e3 100%);
+    border-color: transparent;
+    color: white;
+    box-shadow: 0 2px 10px rgba(110, 142, 251, 0.4);
 }
 
 /* Nested Rows */

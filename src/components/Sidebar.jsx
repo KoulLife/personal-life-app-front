@@ -34,7 +34,7 @@ const Sidebar = ({ isOpen, onClose }) => {
             </button>
 
             <div className="nav-section">
-                <div className="nav-label">Main</div>
+                <div className="nav-label">Menu</div>
                 <NavLink
                     to="/dashboard"
                     end
@@ -44,8 +44,6 @@ const Sidebar = ({ isOpen, onClose }) => {
                     <FaHome className="nav-icon" />
                     <span>Home</span>
                 </NavLink>
-
-                <div className="nav-label" style={{ marginTop: '20px' }}>Services</div>
 
                 {activeServices.includes('PROJECT_MANAGER') && (
                     <NavLink

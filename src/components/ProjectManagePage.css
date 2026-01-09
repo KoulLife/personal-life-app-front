@@ -6,78 +6,7 @@
     overflow: hidden;
 }
 
-/* Local Sidebar */
-.project-sidebar {
-    width: 240px;
-    background: rgba(0, 0, 0, 0.2);
-    border-right: 1px solid rgba(255, 255, 255, 0.1);
-    display: flex;
-    flex-direction: column;
-    padding: 20px;
-}
 
-.project-info {
-    display: flex;
-    align-items: center;
-    margin-bottom: 30px;
-}
-
-.project-icon {
-    width: 40px;
-    height: 40px;
-    background: linear-gradient(135deg, #6e8efb, #a777e3);
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    font-size: 18px;
-    margin-right: 12px;
-}
-
-.project-details .project-name {
-    font-weight: 600;
-    font-size: 15px;
-    line-height: 1.2;
-}
-
-.project-details .project-cat {
-    font-size: 12px;
-    color: rgba(255, 255, 255, 0.5);
-}
-
-.project-menu-label {
-    font-size: 11px;
-    font-weight: 700;
-    color: rgba(255, 255, 255, 0.4);
-    margin-bottom: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.project-menu-item {
-    display: flex;
-    align-items: center;
-    padding: 10px 12px;
-    border-radius: 6px;
-    color: rgba(255, 255, 255, 0.7);
-    cursor: pointer;
-    margin-bottom: 2px;
-    transition: background 0.2s, color 0.2s;
-    font-size: 14px;
-}
-
-.project-menu-item:hover,
-.project-menu-item.active {
-    background: rgba(255, 255, 255, 0.1);
-    color: #6e8efb;
-}
-
-.project-menu-icon {
-    margin-right: 10px;
-    width: 16px;
-    text-align: center;
-}
 
 /* Main Content Area */
 .project-content {

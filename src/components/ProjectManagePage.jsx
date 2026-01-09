@@ -373,43 +373,14 @@ const ProjectManagePage = () => {
 
     return (
         <div className="project-manage-container">
-            {/* Secondary Sidebar (Project specific) */}
-            <div className="project-sidebar">
-                <div className="project-info">
-                    <div className="project-icon">TB</div>
-                    <div className="project-details">
-                        <div className="project-name">Travel Booking</div>
-                        <div className="project-cat">Software project</div>
-                    </div>
-                </div>
 
-                <div className="project-menu-label">Planning</div>
-                <div className="project-menu-item active">
-                    <FaList className="project-menu-icon" />
-                    <span>Roadmap</span>
-                </div>
-                <div className="project-menu-item">
-                    <FaList className="project-menu-icon" /> {/* Using List for backlog too */}
-                    <span>Backlog</span>
-                </div>
-                <div className="project-menu-item">
-                    <FaColumns className="project-menu-icon" />
-                    <span>Board</span>
-                </div>
-
-                <div className="project-menu-label" style={{ marginTop: '20px' }}>Development</div>
-                <div className="project-menu-item">
-                    <FaCode className="project-menu-icon" />
-                    <span>Code</span>
-                </div>
-            </div>
 
             {/* Main Project Content */}
             <div className="project-content">
                 {/* Header */}
                 <div className="project-header">
                     <div className="header-title">
-                        <div className="breadcrumb">Projects / Travel Booking App</div>
+                        <div className="breadcrumb">Menu / Project Manage</div>
                         <h1>Roadmap</h1>
                     </div>
 

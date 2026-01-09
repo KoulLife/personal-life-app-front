@@ -10,51 +10,68 @@ const ProjectManagePage = () => {
     // State for active input field (projectId)
     const [activeInputProjectId, setActiveInputProjectId] = useState(null);
     const [newTaskTitle, setNewTaskTitle] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    useEffect(() => {
-        const fetchProjectGroups = async () => {
-            try {
-                const token = localStorage.getItem('accessToken');
-                const response = await fetch(`${process.env.REACT_APP_API_URL}/project-group`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
+    const fetchProjectGroups = async () => {
+        try {
+            const token = localStorage.getItem('accessToken');
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/project-group`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                const mappedTasks = data.map(group => {
+                    // Calculate progress percentage
+                    const total = group.totalProjectCount || 0;
+                    const completed = group.completedProjectCount || 0;
+                    const percentage = total === 0 ? 0 : Math.round((completed / total) * 100);
+
+                    // Map status to CSS class
+                    let statusClass = 'status-todo';
+                    if (group.status === 'DONE') statusClass = 'status-done';
+                    else if (group.status === 'IN_PROGRESS') statusClass = 'status-in_progress';
+
+                    return {
+                        id: group.projectGroupId,
+                        title: group.groupName,
+                        status: group.status,
+                        statusClass: statusClass,
+                        expanded: false, // Default to collapsed, might want to preserve state?
+                        totalCount: total,
+                        timeline: { width: `${percentage}%`, background: getProgressColor(percentage) },
+                        subtasks: [] // Initial fetch doesn't have expanded subtasks usually
+                    };
                 });
 
-                if (response.ok) {
-                    const data = await response.json();
-                    const mappedTasks = data.map(group => {
-                        // Calculate progress percentage
-                        const total = group.totalProjectCount || 0;
-                        const completed = group.completedProjectCount || 0;
-                        const percentage = total === 0 ? 0 : Math.round((completed / total) * 100);
-
-                        // Map status to CSS class
-                        let statusClass = 'status-todo';
-                        if (group.status === 'DONE') statusClass = 'status-done';
-                        else if (group.status === 'IN_PROGRESS') statusClass = 'status-in_progress';
-
-                        return {
-                            id: group.projectGroupId,
-                            title: group.groupName,
-                            status: group.status,
-                            statusClass: statusClass,
-                            expanded: false,
-                            totalCount: total,
-                            timeline: { width: `${percentage}%`, background: getProgressColor(percentage) },
-                            subtasks: [] // API doesn't provide subtasks yet, initializing empty
-                        };
-                    });
-                    setTasks(mappedTasks);
-                } else {
-                    console.error('Failed to fetch project groups');
-                }
-            } catch (error) {
-                console.error('Error fetching project groups:', error);
+                // Merge with existing expanded state if needed, or just set
+                // innovative: preserve expanded state if IDs match
+                setTasks(prevTasks => {
+                    const expandedMap = new Set(prevTasks.filter(t => t.expanded).map(t => t.id));
+                    return mappedTasks.map(t => ({
+                        ...t,
+                        expanded: expandedMap.has(t.id),
+                        // Preserve subtasks if needed? No, we probably want to re-fetch them if expanded.
+                        // But for now let's just keep the groups list fresh. 
+                        // If a group was expanded, we might need to re-fetch its subtasks too?
+                        // Let's keep it simple: just update the groups stats. 
+                        // If it's expanded, the user might see stale subtasks unless we trigger a subtask fetch.
+                        // For the creating task case: we'll handle partial update or refetch.
+                        subtasks: prevTasks.find(pt => pt.id === t.id)?.subtasks || []
+                    }));
+                });
+            } else {
+                console.error('Failed to fetch project groups');
             }
-        };
+        } catch (error) {
+            console.error('Error fetching project groups:', error);
+        }
+    };
 
+    useEffect(() => {
         fetchProjectGroups();
     }, []);
 
@@ -64,11 +81,11 @@ const ProjectManagePage = () => {
         return '#f5cd47';                       // Yellow/Default
     };
 
-    const handleToggleRow = async (taskId) => {
+    const handleToggleRow = async (taskId, forceFetch = false) => {
         const task = tasks.find(t => t.id === taskId);
 
-        // If we are about to expand
-        if (!task.expanded) {
+        // If we are about to expand OR forcing a refresh
+        if (!task.expanded || forceFetch) {
             try {
                 const token = localStorage.getItem('accessToken');
                 const response = await fetch(`${process.env.REACT_APP_API_URL}/project-group/${taskId}`, {
@@ -103,6 +120,8 @@ const ProjectManagePage = () => {
             }
         }
 
+
+
         // Default toggling behavior (collapse or fallback if fetch fails)
         setTasks(prev => prev.map(t =>
             t.id === taskId ? { ...t, expanded: !t.expanded } : t
@@ -122,6 +141,7 @@ const ProjectManagePage = () => {
     };
 
     const handleKeyDown = (e, parentId) => {
+        if (e.nativeEvent.isComposing) return; // Prevent Korean IME double submission
         if (e.key === 'Enter') {
             submitNewTask(parentId);
         } else if (e.key === 'Escape') {
@@ -130,30 +150,87 @@ const ProjectManagePage = () => {
         }
     };
 
-    const submitNewTask = (parentId) => {
-        if (!newTaskTitle.trim()) {
-            setActiveInputProjectId(null); // Just close if empty
+    const submitNewTask = async (parentId) => {
+        if (!newTaskTitle.trim() || isSubmitting) {
+            if (!newTaskTitle.trim()) setActiveInputProjectId(null);
             return;
         }
 
-        setTasks(tasks.map(task => {
-            if (task.id === parentId) {
-                const newSubTask = {
-                    id: Date.now(),
-                    title: newTaskTitle,
-                    status: 'TODO',
-                    statusClass: 'status-todo',
-                    timeline: { width: '0%', background: '#f5cd47' }
-                };
-                return { ...task, subtasks: [...task.subtasks, newSubTask], expanded: true };
-            }
-            return task;
-        }));
+        setIsSubmitting(true);
+        try {
+            const token = localStorage.getItem('accessToken');
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/project`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    content: newTaskTitle,
+                    projectGroupId: parentId
+                })
+            });
 
-        // Reset
-        setActiveInputProjectId(null);
-        setNewTaskTitle('');
-        // TODO: Call API here to persist
+            if (response.ok) {
+                // Determine if response is JSON or Text
+                const contentType = response.headers.get("content-type");
+                let newProject = null;
+
+                if (contentType && contentType.includes("application/json")) {
+                    newProject = await response.json();
+                } else {
+                    // Assuming text success message, we don't have the object.
+                    // We must RE-FETCH the data to get the new ID.
+                    // Or specifically fetch the project group details.
+                    await handleToggleRow(parentId, true); // Force refresh of the group
+
+                    // Also refresh main stats
+                    fetchProjectGroups();
+
+                    // Reset input
+                    setActiveInputProjectId(null);
+                    setNewTaskTitle('');
+                    return;
+                }
+
+                // If we got JSON, we can do optimistic update with real ID
+                setTasks(tasks.map(task => {
+                    if (task.id === parentId) {
+                        const newSubTask = {
+                            id: newProject.projectId || Date.now(),
+                            title: newProject.content || newTaskTitle,
+                            status: newProject.completeStatus ? 'DONE' : 'TODO',
+                            statusClass: newProject.completeStatus ? 'status-done' : 'status-todo',
+                            timeline: {
+                                width: newProject.completeStatus ? '100%' : '0%',
+                                background: newProject.completeStatus ? '#4bce97' : '#f5cd47'
+                            }
+                        };
+                        return { ...task, subtasks: [...task.subtasks, newSubTask], expanded: true };
+                    }
+                    return task;
+                }));
+            } else {
+                console.error('Failed to create task');
+                alert('Tasks creation failed. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error creating task:', error);
+            // alert('An error occurred: ' + error.message); // Temporarily detailed
+            alert('Task created, but could not parse server response properly. Refreshing...');
+            window.location.reload(); // Hard fallback if totally confused
+        } finally {
+            setIsSubmitting(false);
+            // Only reset if successful or we want to retry?
+            // If successful, input should be closed.
+            // If failed, maybe keep input open?
+            // Current logic resets everything at the end.
+            // Let's reset only if it was NOT an early return.
+            // Actually, for better UX on error, we might want to keep the text?
+            // But previous logic resets. Let's stick to closing for now to match behavior.
+            setActiveInputProjectId(null);
+            setNewTaskTitle('');
+        }
     };
 
     const toggleSubtaskStatus = async (parentId, subtaskId, currentStatus) => {
@@ -378,6 +455,7 @@ const ProjectManagePage = () => {
                                                             onChange={(e) => setNewTaskTitle(e.target.value)}
                                                             onKeyDown={(e) => handleKeyDown(e, task.id)}
                                                             autoFocus
+                                                            disabled={isSubmitting}
                                                         />
                                                         <div className="creation-actions">
                                                             <button
@@ -386,8 +464,9 @@ const ProjectManagePage = () => {
                                                                     e.stopPropagation();
                                                                     submitNewTask(task.id);
                                                                 }}
+                                                                disabled={isSubmitting}
                                                             >
-                                                                Add
+                                                                {isSubmitting ? 'Adding...' : 'Add'}
                                                             </button>
                                                             <button
                                                                 className="btn-cancel"
@@ -396,6 +475,7 @@ const ProjectManagePage = () => {
                                                                     setActiveInputProjectId(null);
                                                                     setNewTaskTitle('');
                                                                 }}
+                                                                disabled={isSubmitting}
                                                             >
                                                                 Cancel
                                                             </button>

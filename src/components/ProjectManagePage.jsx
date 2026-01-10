@@ -448,21 +448,17 @@ const ProjectManagePage = () => {
                 {/* Header */}
                 <div className="project-header">
                     <div className="header-title">
-                        <div className="breadcrumb">Menu / Project Manage</div>
-                        <h1>Roadmap</h1>
+                        <h1>Project Manager</h1>
                     </div>
 
                     <div className="header-controls">
-                        <button className="control-btn"><FaShareAlt /> Share</button>
-                        <button className="control-btn"><FaShareAlt /> Export</button>
-                        <button className="control-btn primary-btn">Create</button>
+                        <button className="control-btn"><FaShareAlt /> 공유</button>
                     </div>
                 </div>
 
                 {/* Roadmap Content */}
                 <div className="roadmap-container">
                     <div className="roadmap-search-bar">
-                        <input type="text" className="search-input" placeholder="Search epics..." />
 
                         <div className="filter-group">
                             <div className="user-avatars">
@@ -472,15 +468,14 @@ const ProjectManagePage = () => {
                                 <div className="avatar" style={{ background: '#607D8B' }}>+2</div>
                             </div>
 
-                            <button className="control-btn">Status category</button>
-                            <button className="control-btn">Version</button>
+                            <button className="control-btn">초대</button>
                         </div>
                     </div>
 
                     {/* Gantt Chart Implementation */}
                     <div className="gantt-chart">
                         <div className="chart-header">
-                            <div className="header-cell">Project Name</div>
+                            <div className="header-cell">프로젝트 명</div>
                         </div>
 
                         {tasks.map(task => (
@@ -521,9 +516,6 @@ const ProjectManagePage = () => {
                                                 <div className="task-metadata" style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '11px', color: 'rgba(255,255,255,0.5)' }}>
                                                     <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                                                         <FaList size={10} /> {task.totalCount || 0} Projects
-                                                    </span>
-                                                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#ff6b6b' }}>
-                                                        <FaRegCalendarAlt size={10} /> D-3
                                                     </span>
                                                     {/* Percentage Text */}
                                                     <span className="progress-text" style={{ color: task.timeline.background }}>
@@ -594,14 +586,6 @@ const ProjectManagePage = () => {
                                                                     </div>
                                                                 </div>
                                                             )}
-                                                            <div className="subtask-metadata" style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '11px', color: 'rgba(255,255,255,0.5)' }}>
-                                                                <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                                                    <FaCodeBranch size={10} /> 3/5
-                                                                </span>
-                                                                <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#ff6b6b' }}>
-                                                                    <FaRegCalendarAlt size={10} /> 2025년 12월 29일
-                                                                </span>
-                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>

@@ -71,10 +71,14 @@ const Sidebar = ({ isOpen, onClose }) => {
                 )}
 
                 {activeServices.includes('FINANCIAL_MANAGER') && (
-                    <div className="nav-item" onClick={onClose}>
+                    <NavLink
+                        to="/dashboard/financial"
+                        className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+                        onClick={onClose}
+                    >
                         <FaWallet className="nav-icon" />
                         <span>Financial Manager</span>
-                    </div>
+                    </NavLink>
                 )}
             </div>
 

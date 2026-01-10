@@ -89,8 +89,9 @@
     cursor: pointer;
 }
 
-.activity-box {
+.financial-box {
     grid-column: span 1;
+    cursor: pointer;
 }
 
 .status-box {
@@ -290,38 +291,110 @@
     font-size: 0.9rem;
 }
 
-/* 5. ACTIVITY */
-.graph-header {
+/* 5. FINANCIAL BOX (New) */
+.icon-wrapper.financial {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    background: rgba(16, 185, 129, 0.2);
+    color: #10b981;
     display: flex;
-    justify-content: space-between;
-    width: 100%;
-    margin-bottom: 16px;
-    color: var(--text-muted);
-    font-size: 0.9rem;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
 }
 
 .value-up {
-    color: #4ade80;
+    color: #10b981;
     font-weight: 600;
 }
 
-.mock-graph {
-    display: flex;
-    align-items: flex-end;
-    gap: 6px;
-    height: 120px;
+.financial-info {
+    margin-bottom: auto;
+}
+
+.financial-info .label {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.financial-info .value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #fff;
+    font-variant-numeric: tabular-nums;
+}
+
+.mini-chart-line {
+    margin-top: 16px;
     width: 100%;
 }
 
-.bar {
-    flex: 1;
+.chart-track {
+    width: 100%;
+    height: 6px;
     background: rgba(255, 255, 255, 0.1);
-    border-radius: 4px;
+    border-radius: 3px;
+    overflow: hidden;
 }
 
-.bar:last-child {
-    background: var(--primary-accent);
+.chart-fill {
+    height: 100%;
+    background: #10b981;
+    border-radius: 3px;
 }
+
+/* LOCKED STATE */
+.financial-box.locked {
+    background: repeating-linear-gradient(45deg,
+            rgba(255, 255, 255, 0.03),
+            rgba(255, 255, 255, 0.03) 10px,
+            rgba(255, 255, 255, 0.05) 10px,
+            rgba(255, 255, 255, 0.05) 20px);
+    border: 1px dashed rgba(255, 255, 255, 0.1);
+    cursor: default;
+}
+
+.icon-wrapper.locked {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    margin-bottom: 16px;
+}
+
+.locked-msg {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 16px;
+    text-align: center;
+}
+
+.activate-btn {
+    padding: 8px 16px;
+    background: var(--text-primary);
+    color: #000;
+    border-radius: 99px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.activate-btn:hover {
+    transform: scale(1.05);
+}
+
 
 /* 6. STATUS */
 .status-ring {

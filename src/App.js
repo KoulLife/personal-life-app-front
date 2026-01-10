@@ -5,7 +5,7 @@ import SignupPage from './components/SignupPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import MainLayout from './components/MainLayout';
 import DashboardHome from './components/DashboardHome';
-import ProjectManagePage from './components/ProjectManagePage';
+import FinancialManagerPage from "./components/FinancialManagerPage";import ProjectManagePage from './components/ProjectManagePage';
 import './App.css';
 
 import ProjectServiceMapPage from './components/ProjectServiceMapPage';
@@ -29,6 +29,7 @@ function App() {
                 <Route path="project" element={<ProjectManagePage />} />
                 <Route path="project-group/:groupId" element={<ProjectServiceMapPage />} />
                 <Route path="service/integration" element={<ServiceIntegrationPage />} />
+                <Route path="financial" element={<FinancialManagerPage />} />
                 {/* Future routes can be added here */}
               </Route>
             </Route>

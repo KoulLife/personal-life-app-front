@@ -1,0 +1,888 @@
+/* FinancialManagerPage.css */
+
+.financial-page {
+    width: 100%;
+    height: 100%;
+    color: #fff;
+    /* Dark theme text */
+    font-family: 'Inter', -apple-system, sans-serif;
+    padding-bottom: 40px;
+    background: transparent;
+    /* Main layout handles bg */
+}
+
+/* GLOBAL RESET FOR COMPONENT */
+.financial-page * {
+    box-sizing: border-box;
+}
+
+/* HIGH DENSITY GRID */
+.financial-grid-high-density {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    /* Auto rows */
+    gap: 16px;
+    /* Tight gap */
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 24px;
+}
+
+/* 1. Header Bar */
+.header-bar {
+    grid-column: span 4;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 16px;
+}
+
+/* Breadcrumbs Removed from usage but keeping class if needed later, or can delete. Keeping minimal. */
+
+.page-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.page-header h1 {
+    font-size: 1.5rem;
+    /* Smaller, sharper header */
+    font-weight: 600;
+    margin: 0;
+}
+
+.header-tools {
+    margin-left: auto;
+    display: flex;
+    gap: 8px;
+    margin-top: -30px;
+    /* Pull up to align with header */
+}
+
+.tool-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.03);
+    color: rgba(255, 255, 255, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.tool-btn.primary {
+    background: #fff;
+    color: #000;
+}
+
+/* 2. Metric Cards (Dense) */
+.metric-card {
+    grid-column: span 1;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid transparent;
+    /* Prepare for gradient border */
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+    /* Default dark fallback */
+    background-clip: padding-box;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.metric-card:hover {
+    transform: translateY(-2px);
+}
+
+/* Total Revenue: Green Gradient */
+.metric-card.revenue {
+    background: linear-gradient(#1e293b, #1e293b) padding-box,
+        linear-gradient(135deg, #10b981, #34d399, #6ee7b7) border-box;
+}
+
+.metric-card.revenue:hover {
+    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.2);
+}
+
+/* Available Funds: Blue Gradient */
+.metric-card.funds {
+    background: linear-gradient(#1e293b, #1e293b) padding-box,
+        linear-gradient(135deg, #3b82f6, #60a5fa, #93c5fd) border-box;
+}
+
+.metric-card.funds:hover {
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.2);
+}
+
+/* Total Expenses: Red Gradient */
+.metric-card.expenses {
+    background: linear-gradient(#1e293b, #1e293b) padding-box,
+        linear-gradient(135deg, #f87171, #fca5a5, #fecaca) border-box;
+}
+
+.metric-card.expenses:hover {
+    box-shadow: 0 8px 25px rgba(248, 113, 113, 0.2);
+}
+
+
+/* AI Feedback Card Special Styling (Gemini/Rainbow Style) */
+.metric-card.ai-feedback-card {
+    cursor: pointer;
+    background: linear-gradient(#1e293b, #1e293b) padding-box,
+        linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899) border-box;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.15);
+}
+
+.metric-card.ai-feedback-card:hover {
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
+    background: linear-gradient(#1e293b, #1e293b) padding-box,
+        linear-gradient(135deg, #60a5fa, #c084fc, #f472b6) border-box;
+}
+
+.metric-card.ai-feedback-card::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    opacity: 0;
+    transform: scale(0.5);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    pointer-events: none;
+}
+
+.metric-card.ai-feedback-card:hover::after {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* Black Hole Card Style */
+.metric-card.black-hole-card {
+    grid-column: span 4;
+    /* Full Width */
+    min-height: 140px;
+    /* Increased height */
+    background: radial-gradient(circle at center, #172554 0%, #000000 100%);
+    /* Blue core */
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    /* Blue border */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    cursor: pointer;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5), inset 0 0 30px rgba(59, 130, 246, 0.2);
+}
+
+.black-hole-content {
+    z-index: 2;
+    position: relative;
+}
+
+.black-hole-content h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0 0 4px 0;
+    background: linear-gradient(to right, #fff, #93c5fd);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+}
+
+.black-hole-content p {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0;
+}
+
+.black-hole-effect {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 200%;
+    height: 200%;
+    transform: translate(-50%, -50%);
+    background: conic-gradient(from 0deg, transparent, rgba(59, 130, 246, 0.1), transparent 60%);
+    animation: rotateBlackHole 10s linear infinite;
+    z-index: 1;
+    pointer-events: none;
+}
+
+@keyframes rotateBlackHole {
+    from {
+        transform: translate(-50%, -50%) rotate(0deg);
+    }
+
+    to {
+        transform: translate(-50%, -50%) rotate(360deg);
+    }
+}
+
+.metric-card.black-hole-card:hover {
+    box-shadow: 0 0 30px rgba(59, 130, 246, 0.4), inset 0 0 50px rgba(59, 130, 246, 0.3);
+    border-color: rgba(59, 130, 246, 0.6);
+}
+
+
+.flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.ai-icon {
+    font-size: 1.5rem;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 2px 4px rgba(139, 92, 246, 0.3));
+}
+
+.card-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.card-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-variant-numeric: tabular-nums;
+}
+
+.card-trend {
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 500;
+    z-index: 1;
+    /* Ensure above shine */
+}
+
+.card-trend.positive {
+    color: #4ade80;
+    background: rgba(74, 222, 128, 0.1);
+    width: fit-content;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.card-trend.negative {
+    color: #f87171;
+    background: rgba(248, 113, 113, 0.1);
+    width: fit-content;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+/* 3. Charts */
+.card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    /* Fallback */
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.chart-card-lg {
+    grid-column: span 2;
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.card-header h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.chart-legend {
+    display: flex;
+    gap: 12px;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 12px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.dot.blue {
+    background: #3b82f6;
+}
+
+.dot.yellow {
+    background: #fbbf24;
+}
+
+.dot.red {
+    background: #f87171;
+}
+
+.dot.green {
+    background: #22c55e;
+}
+
+.mock-line-chart {
+    flex: 1;
+    margin-bottom: 8px;
+    opacity: 0.8;
+}
+
+.chart-axis-x {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+/* Heatmap (Monthly Spending) */
+.heatmap-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+}
+
+.month-label {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: 500;
+}
+
+.heatmap-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    /* 7 days a week approx for visual */
+    grid-template-rows: repeat(5, 1fr);
+    gap: 6px;
+    width: 100%;
+    height: 100%;
+}
+
+.heatmap-cell {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    transition: transform 0.2s, background-color 0.2s;
+    cursor: help;
+    /* Indicate tooltip */
+}
+
+.heatmap-cell:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 10px rgba(248, 113, 113, 0.5);
+}
+
+/* Heatmap Levels (Red Shades for Spending - Cautionary/Heat) */
+.heatmap-cell.level-0 {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.heatmap-cell.level-1 {
+    background: rgba(248, 113, 113, 0.2);
+}
+
+.heatmap-cell.level-2 {
+    background: rgba(248, 113, 113, 0.4);
+}
+
+.heatmap-cell.level-3 {
+    background: rgba(248, 113, 113, 0.7);
+}
+
+.heatmap-cell.level-4 {
+    background: #f87171;
+    box-shadow: 0 0 8px #f87171;
+}
+
+/* 4. Dense Table */
+.table-card-full {
+    grid-column: span 4;
+    min-height: 300px;
+}
+
+.table-container {
+    overflow-x: auto;
+}
+
+.dense-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.dense-table th {
+    text-align: left;
+    /* Changed to Left per user request */
+    padding: 12px 16px;
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 500;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dense-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    text-align: left;
+    /* Changed to Left per user request */
+}
+
+/* Specific overrides if needed */
+.dense-table th.right,
+.dense-table td.right {
+    text-align: right;
+}
+
+.dense-table th.center,
+.dense-table td.center {
+    text-align: center;
+}
+
+.dense-table th.left,
+.dense-table td.left {
+    text-align: left;
+}
+
+.icon-btn {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+}
+
+.icon-btn:hover {
+    color: #fff;
+}
+
+
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: #1e293b;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 24px;
+    width: 400px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: #fff;
+}
+
+.close-btn {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    font-size: 1.2rem;
+}
+
+.close-btn:hover {
+    color: #fff;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 8px;
+}
+
+.form-input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    /* Slightly more rounded */
+    padding: 12px 14px;
+    /* Increased padding */
+    color: #fff;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    height: 48px;
+    /* Consistent height */
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    /* Subtle glow */
+}
+
+/* Custom Select Styling */
+select.form-input {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='rgba(255, 255, 255, 0.5)'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    background-size: 16px;
+    padding-right: 40px;
+    /* Space for arrow */
+    cursor: pointer;
+}
+
+select.form-input option {
+    background-color: #1e293b;
+    color: #fff;
+    padding: 10px;
+}
+
+/* DatePicker Overrides for Dark Mode */
+.react-datepicker-wrapper {
+    width: 100%;
+}
+
+.react-datepicker {
+    background-color: #1e293b !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+    color: #fff !important;
+}
+
+.react-datepicker__header {
+    background-color: #0f172a !important;
+    border-bottom-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.react-datepicker__current-month,
+.react-datepicker__day-name,
+.react-datepicker__day {
+    color: #fff !important;
+}
+
+.react-datepicker__day:hover {
+    background-color: #3b82f6 !important;
+}
+
+.react-datepicker__day--selected {
+    background-color: #2563eb !important;
+}
+
+.custom-datepicker-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    z-index: 10;
+    /* Ensure visibility */
+}
+
+.calendar-icon {
+    position: absolute;
+    right: 12px;
+    color: rgba(255, 255, 255, 0.5);
+    pointer-events: none;
+    z-index: 1;
+    /* Ensure icon stays on top */
+}
+
+/* Fix DatePicker Wrapper Width */
+.full-width-datepicker {
+    width: 100%;
+    display: block !important;
+}
+
+.full-width-datepicker .react-datepicker__input-container {
+    display: block;
+}
+
+.mt-2 {
+    margin-top: 12px;
+    /* Consistent spacing */
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.btn-cancel {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.8);
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.btn-submit {
+    background: #3b82f6;
+    border: none;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.btn-submit:hover {
+    background: #2563eb;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .financial-grid-high-density {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .header-bar,
+    .table-card-full,
+    .metric-card.black-hole-card {
+        grid-column: span 2;
+    }
+
+    .chart-card-lg {
+        grid-column: span 2;
+    }
+}
+
+@media (max-width: 768px) {
+    .financial-grid-high-density {
+        grid-template-columns: 1fr;
+    }
+
+    .header-bar,
+    .metric-card,
+    .chart-card-lg,
+    .table-card-full,
+    .metric-card.black-hole-card {
+        grid-column: span 1;
+    }
+}
+
+/* --- Financial Status Modal Styles --- */
+
+.modal-content.status-modal {
+    width: 600px;
+    max-width: 90vw;
+    /* Fixed 3-part layout (Header, Body, Footer) */
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    max-height: 85vh;
+}
+
+.status-modal-form {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    /* Prevent form itself from scrolling */
+}
+
+.status-modal .modal-header {
+    flex-shrink: 0;
+    padding: 24px;
+    margin-bottom: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    background: #1e293b;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+.status-modal .modal-body {
+    flex: 1;
+    overflow-y: auto;
+    /* Scroll ONLY the body */
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.status-modal .modal-footer {
+    flex-shrink: 0;
+    padding: 16px 24px;
+    background: #1e293b;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    /* Fix for weird panel: round the bottom corners */
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+}
+
+.form-section {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+    padding: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.section-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #93c5fd;
+    /* Light Blue */
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid rgba(147, 197, 253, 0.2);
+    padding-bottom: 8px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    /* Increased gap */
+    width: 100%;
+}
+
+.compound-input {
+    display: flex;
+    gap: 12px;
+    /* Explicit gap between compound inputs */
+    width: 100%;
+}
+
+.sub-label {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 8px;
+    display: block;
+}
+
+/* Chips */
+.chip-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.chip {
+    padding: 6px 12px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.chip:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.chip.active {
+    background: rgba(59, 130, 246, 0.2);
+    border-color: #3b82f6;
+    color: #fff;
+    font-weight: 500;
+}
+
+.chip.red.active {
+    background: rgba(248, 113, 113, 0.2);
+    border-color: #f87171;
+}
+
+/* Choice Buttons */
+.choice-btn-group {
+    display: flex;
+    gap: 2px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 4px;
+    border-radius: 8px;
+}
+
+.choice-btn {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 8px;
+    border-radius: 6px;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.choice-btn.active {
+    background: #3b82f6;
+    color: #fff;
+    font-weight: 600;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive Form */
+@media (max-width: 600px) {
+    .form-row {
+        grid-template-columns: 1fr;
+        /* Stack on small screens */
+    }
+}

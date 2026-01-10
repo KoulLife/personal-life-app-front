@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useServices } from '../contexts/ServiceContext';
-import { FaBolt, FaArrowRight, FaGlobeAmericas, FaLayerGroup } from 'react-icons/fa';
+import { FaBolt, FaArrowRight, FaGlobeAmericas, FaLayerGroup, FaWallet } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import './DashboardHome.css';
 
@@ -129,26 +129,50 @@ const DashboardHome = () => {
                     </div>
                 </motion.div>
 
-                {/* 5. Activity Graph */}
-                <motion.div className="bento-item activity-box" variants={item}>
-                    <div className="content">
-                        <div className="graph-header">
-                            <span className="label">Productivity</span>
-                            <span className="value-up">+24%</span>
+                {/* 5. Financial Manager Widget (Conditional) */}
+                {activeServices?.includes('FINANCIAL_MANAGER') ? (
+                    <motion.div
+                        className="bento-item financial-box"
+                        variants={item}
+                        whileHover={{ scale: 1.02, backgroundColor: "rgba(16, 185, 129, 0.1)" }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => navigate('/dashboard/financial')}
+                    >
+                        <div className="content">
+                            <div className="header-row">
+                                <div className="icon-wrapper financial">
+                                    <FaWallet />
+                                </div>
+                                <span className="value-up">+12%</span>
+                            </div>
+                            <div className="financial-info">
+                                <span className="label">Total Assets</span>
+                                <span className="value">$24,593</span>
+                            </div>
+                            <div className="mini-chart-line">
+                                <div className="chart-track">
+                                    <div className="chart-fill" style={{ width: '68%' }}></div>
+                                </div>
+                            </div>
                         </div>
-                        <div className="mock-graph">
-                            {['30%', '50%', '40%', '70%', '60%', '80%', '95%'].map((h, i) => (
-                                <motion.div
-                                    key={i}
-                                    className="bar"
-                                    initial={{ height: 0 }}
-                                    animate={{ height: h }}
-                                    transition={{ duration: 1, delay: 0.5 + (i * 0.1) }}
-                                />
-                            ))}
+                    </motion.div>
+                ) : (
+                    <motion.div
+                        className="bento-item financial-box locked"
+                        variants={item}
+                        whileHover={{ scale: 1.02 }}
+                        onClick={() => navigate('/dashboard/service/integration')}
+                    >
+                        <div className="content centered">
+                            <div className="icon-wrapper locked">
+                                <FaWallet />
+                            </div>
+                            <h3>Financial Manager</h3>
+                            <p className="locked-msg">Activate to manage assets.</p>
+                            <button className="activate-btn">Subscribe</button>
                         </div>
-                    </div>
-                </motion.div>
+                    </motion.div>
+                )}
 
                 {/* 6. Network Status */}
                 <motion.div className="bento-item status-box" variants={item}>

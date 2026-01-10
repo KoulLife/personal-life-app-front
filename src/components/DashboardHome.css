@@ -1,0 +1,396 @@
+/* DashboardHome.css */
+
+:root {
+    --glass-bg: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.06);
+    --glass-highlight: rgba(255, 255, 255, 0.1);
+    --text-primary: #ffffff;
+    --text-muted: rgba(255, 255, 255, 0.6);
+    --primary-accent: #a78bfa;
+}
+
+.dashboard-container {
+    width: 100%;
+    /* Remove fixed height to allow scrolling if needed, but min-height for full screen feel */
+    min-height: calc(100vh - 80px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    /* BACKGROUND TRANSPARENT TO SHOW MAIN LAYOUT BG */
+    background: transparent;
+    font-family: 'Inter', -apple-system, sans-serif;
+    color: var(--text-primary);
+    overflow: hidden;
+}
+
+/* Subtle glow overlay just to tint the background image slightly */
+.ambient-glow {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 30% 20%, rgba(139, 92, 246, 0.08), transparent 40%),
+        radial-gradient(circle at 70% 80%, rgba(59, 130, 246, 0.08), transparent 40%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* BENTO GRID */
+.bento-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(2, 260px);
+    /* Slightly taller */
+    gap: 24px;
+    width: 100%;
+    max-width: 1200px;
+    padding: 2rem;
+    position: relative;
+    z-index: 10;
+}
+
+.bento-item {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 32px;
+    /* More rounded Apple-like */
+    padding: 24px;
+    backdrop-filter: blur(20px);
+    /* Heavy blur */
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    /* Default cursor */
+    cursor: default;
+}
+
+/* GRID AREAS */
+.welcome-box {
+    grid-column: span 2;
+    justify-content: center;
+}
+
+.project-box {
+    grid-column: span 1;
+    grid-row: span 2;
+    cursor: pointer;
+}
+
+.clock-box {
+    grid-column: span 1;
+    justify-content: center;
+    align-items: center;
+}
+
+.integration-box {
+    grid-column: span 1;
+    cursor: pointer;
+}
+
+.activity-box {
+    grid-column: span 1;
+}
+
+.status-box {
+    grid-column: span 1;
+    justify-content: center;
+    align-items: center;
+}
+
+/* 1. WELCOME BOX */
+.welcome-box .sub-label {
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.welcome-box h1 {
+    font-size: 3rem;
+    line-height: 1.1;
+    font-weight: 700;
+    margin-bottom: 16px;
+    background: linear-gradient(to right, #fff, #cbd5e1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.status-text {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: #4ade80;
+    background: rgba(74, 222, 128, 0.1);
+    padding: 6px 12px;
+    border-radius: 99px;
+    width: fit-content;
+}
+
+.status-text .dot {
+    width: 6px;
+    height: 6px;
+    background: currentColor;
+    border-radius: 50%;
+}
+
+/* 2. PROJECT BOX (Interactive) */
+.project-box {
+    background: linear-gradient(170deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%);
+}
+
+.icon-wrapper.primary {
+    width: 48px;
+    height: 48px;
+    border-radius: 16px;
+    background: rgba(167, 139, 250, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: #a78bfa;
+    margin-bottom: 24px;
+}
+
+.project-box h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 24px;
+}
+
+/* UI Mockup in Project Box */
+.mini-ui-mockup {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: auto;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.ui-header {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.ui-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    opacity: 0.5;
+}
+
+.ui-dot.red {
+    background: #f87171;
+}
+
+.ui-dot.yellow {
+    background: #fbbf24;
+}
+
+.ui-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.ui-checkbox {
+    width: 12px;
+    height: 12px;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.ui-line {
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+}
+
+.ui-line.long {
+    width: 80%;
+}
+
+.ui-line.medium {
+    width: 60%;
+}
+
+.ui-line.short {
+    width: 40%;
+}
+
+.action-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #fff;
+    margin-top: 20px;
+}
+
+/* 3. CLOCK BOX */
+.time-display {
+    font-size: 4rem;
+    font-weight: 300;
+    line-height: 1;
+    letter-spacing: -2px;
+    font-variant-numeric: tabular-nums;
+    margin-bottom: 8px;
+}
+
+.date-display {
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+/* 4. INTEGRATIONS */
+.header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 24px;
+}
+
+.icon-wrapper.secondary {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    background: rgba(59, 130, 246, 0.2);
+    color: #60a5fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+.active-indicator {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 99px;
+    padding: 6px 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.integration-box h3 {
+    font-size: 1.4rem;
+    margin-bottom: 4px;
+}
+
+.caption {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+/* 5. ACTIVITY */
+.graph-header {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 16px;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.value-up {
+    color: #4ade80;
+    font-weight: 600;
+}
+
+.mock-graph {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    height: 120px;
+    width: 100%;
+}
+
+.bar {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.bar:last-child {
+    background: var(--primary-accent);
+}
+
+/* 6. STATUS */
+.status-ring {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    color: #fff;
+    position: relative;
+    margin-bottom: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ring-pulse {
+    position: absolute;
+    inset: -5px;
+    border-radius: 50%;
+    border: 2px solid rgba(167, 139, 250, 0.3);
+    animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@keyframes ping {
+
+    75%,
+    100% {
+        transform: scale(1.4);
+        opacity: 0;
+    }
+}
+
+.status-label {
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 1024px) {
+    .bento-grid {
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: auto;
+    }
+
+    .project-box {
+        grid-column: span 1;
+        grid-row: span 1;
+        min-height: 260px;
+    }
+}
+
+@media (max-width: 650px) {
+    .bento-grid {
+        grid-template-columns: 1fr;
+        padding: 1rem;
+        gap: 16px;
+    }
+
+    .welcome-box {
+        grid-column: span 1;
+    }
+
+    .bento-item {
+        padding: 20px;
+    }
+
+    .welcome-box h1 {
+        font-size: 2rem;
+    }
+}

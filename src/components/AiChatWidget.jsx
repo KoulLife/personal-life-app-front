@@ -8,6 +8,7 @@ const AiChatWidget = () => {
         { id: 1, text: "학습하고 싶은 것이나 시작하고 싶은 프로젝트 이름만 알려주세요. 자동으로 할 일을 추가해 드릴게요!", sender: 'bot' }
     ]);
     const [inputValue, setInputValue] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
     const messagesEndRef = useRef(null);
 
     const scrollToBottom = () => {
@@ -24,7 +25,7 @@ const AiChatWidget = () => {
         setIsOpen(!isOpen);
     };
 
-    const handleSendMessage = (e) => {
+    const handleSendMessage = async (e) => {
         e.preventDefault();
         if (!inputValue.trim()) return;
 
@@ -37,15 +38,45 @@ const AiChatWidget = () => {
         setMessages(prev => [...prev, newUserMessage]);
         setInputValue('');
 
-        // Simulate Bot Response
-        setTimeout(() => {
-            const botResponse = {
+        setIsLoading(true);
+        try {
+            const token = localStorage.getItem('accessToken');
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/ai/chat?message=${encodeURIComponent(inputValue)}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                const data = await response.text(); // Assuming endpoint returns String
+                const botResponse = {
+                    id: Date.now() + 1,
+                    text: data,
+                    sender: 'bot'
+                };
+                setMessages(prev => [...prev, botResponse]);
+            } else {
+                console.error('Failed to get AI response');
+                const errorResponse = {
+                    id: Date.now() + 1,
+                    text: "죄송합니다. AI 응답을 가져오는데 실패했습니다.",
+                    sender: 'bot'
+                };
+                setMessages(prev => [...prev, errorResponse]);
+            }
+        } catch (error) {
+            console.error('Error calling AI API:', error);
+            const errorResponse = {
                 id: Date.now() + 1,
-                text: "I'm currently a demo interface. Real AI integration coming soon!",
+                text: "로그인이 필요하거나 서버에 연결할 수 없습니다.",
                 sender: 'bot'
             };
-            setMessages(prev => [...prev, botResponse]);
-        }, 1000);
+            setMessages(prev => [...prev, errorResponse]);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -80,7 +111,7 @@ const AiChatWidget = () => {
                             value={inputValue}
                             onChange={(e) => setInputValue(e.target.value)}
                         />
-                        <button type="submit" className="chat-send-btn">
+                        <button type="submit" className="chat-send-btn" disabled={isLoading}>
                             <FaPaperPlane size={14} />
                         </button>
                     </form>

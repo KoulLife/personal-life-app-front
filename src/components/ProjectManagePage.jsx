@@ -369,6 +369,27 @@ const ProjectManagePage = () => {
         }
     };
 
+    const handleDeleteGroup = async (groupId) => {
+        if (!window.confirm('Are you sure you want to delete this project group? All tasks within it will be deleted.')) return;
+
+        // Optimistic Update
+        setTasks(prev => prev.filter(t => t.id !== groupId));
+
+        try {
+            const token = localStorage.getItem('accessToken');
+            await fetch(`${process.env.REACT_APP_API_URL}/project-group/${groupId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+        } catch (error) {
+            console.error('Error deleting project group:', error);
+            alert('Failed to delete project group');
+            fetchProjectGroups(); // Revert
+        }
+    };
+
     const handleEditClick = (task, e) => {
         e.stopPropagation();
         setEditingTaskId(task.id);
@@ -514,6 +535,16 @@ const ProjectManagePage = () => {
 
                                         <div className="task-right-group">
                                             <span className={`task-status-badge ${task.statusClass}`}>{task.status}</span>
+                                            <button
+                                                className="group-delete-btn"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleDeleteGroup(task.id);
+                                                }}
+                                                title="Delete Project Group"
+                                            >
+                                                <FaTrash />
+                                            </button>
                                         </div>
                                     </div>
                                 </div>

@@ -604,6 +604,34 @@
     color: #ff6b6b;
 }
 
+/* Group Delete Button */
+.group-delete-btn {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 6px;
+    margin-left: 8px;
+    border-radius: 4px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    /* Hidden by default */
+}
+
+.task-row:hover .group-delete-btn {
+    opacity: 1;
+    /* Show on hover */
+}
+
+.group-delete-btn:hover {
+    color: #ff6b6b;
+    background: rgba(255, 107, 107, 0.1);
+}
+
 /* Edit Input */
 .edit-task-input {
     background: rgba(0, 0, 0, 0.2);
@@ -662,7 +690,9 @@
         height: 24px;
         font-size: 9px;
     }
-}/* Create Group Button */
+}
+
+/* Create Group Button */
 .create-group-row {
     padding: 15px;
     display: flex;

@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './ProjectManagePage.css';
 import { FaBolt, FaList, FaColumns, FaCode, FaShareAlt, FaChevronRight, FaChevronDown, FaPlus, FaArrowRight, FaCheck, FaCodeBranch, FaRegCalendarAlt, FaPen, FaTrash } from 'react-icons/fa';
+import DatePicker from 'react-datepicker';
+import "react-datepicker/dist/react-datepicker.css";
+import AiChatWidget from './AiChatWidget';
 
 const ProjectManagePage = () => {
     const navigate = useNavigate();
@@ -15,6 +18,50 @@ const ProjectManagePage = () => {
     // Edit State
     const [editingTaskId, setEditingTaskId] = useState(null);
     const [editContent, setEditContent] = useState('');
+
+    // Project Group Creation State
+    const [showCreateModal, setShowCreateModal] = useState(false);
+    const [newGroupName, setNewGroupName] = useState('');
+    const [startDate, setStartDate] = useState(null);
+    const [endDate, setEndDate] = useState(null);
+
+    const handleCreateGroup = async () => {
+        if (!newGroupName.trim()) {
+            alert('Project Group Name is required.');
+            return;
+        }
+
+        try {
+            const token = localStorage.getItem('accessToken');
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/project-group`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    groupName: newGroupName,
+                    startDate: startDate ? startDate.toISOString() : null,
+                    endDate: endDate ? endDate.toISOString() : null
+                })
+            });
+
+            if (response.ok) {
+                // Refresh list and close modal
+                fetchProjectGroups();
+                setShowCreateModal(false);
+                setNewGroupName('');
+                setStartDate(null);
+                setEndDate(null);
+            } else {
+                console.error('Failed to create project group');
+                alert('Failed to create project group.');
+            }
+        } catch (error) {
+            console.error('Error creating project group:', error);
+            alert('An error occurred.');
+        }
+    };
 
     const fetchProjectGroups = async () => {
         try {
@@ -322,6 +369,27 @@ const ProjectManagePage = () => {
         }
     };
 
+    const handleDeleteGroup = async (groupId) => {
+        if (!window.confirm('Are you sure you want to delete this project group? All tasks within it will be deleted.')) return;
+
+        // Optimistic Update
+        setTasks(prev => prev.filter(t => t.id !== groupId));
+
+        try {
+            const token = localStorage.getItem('accessToken');
+            await fetch(`${process.env.REACT_APP_API_URL}/project-group/${groupId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+        } catch (error) {
+            console.error('Error deleting project group:', error);
+            alert('Failed to delete project group');
+            fetchProjectGroups(); // Revert
+        }
+    };
+
     const handleEditClick = (task, e) => {
         e.stopPropagation();
         setEditingTaskId(task.id);
@@ -467,6 +535,16 @@ const ProjectManagePage = () => {
 
                                         <div className="task-right-group">
                                             <span className={`task-status-badge ${task.statusClass}`}>{task.status}</span>
+                                            <button
+                                                className="group-delete-btn"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleDeleteGroup(task.id);
+                                                }}
+                                                title="Delete Project Group"
+                                            >
+                                                <FaTrash />
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -583,9 +661,77 @@ const ProjectManagePage = () => {
                             </React.Fragment>
                         ))}
 
-                    </div>
+                        {/* Create Group Button */}
+                        <div className="create-group-row" onClick={() => setShowCreateModal(true)}>
+                            <div className="create-icon-wrapper">
+                                <FaPlus />
+                            </div>
+                        </div>
+                    </div> {/* End of gantt-chart */}
+
+                    {/* Create Project Group Modal */}
+                    {showCreateModal && (
+                        <div className="modal-overlay">
+                            <div className="modal-content" style={{ maxWidth: '500px' }}>
+                                <h3>Create Project Group</h3>
+
+                                <div className="form-group">
+                                    <label>Project Group Name</label>
+                                    <input
+                                        type="text"
+                                        className="modal-input"
+                                        value={newGroupName}
+                                        onChange={(e) => setNewGroupName(e.target.value)}
+                                        placeholder="Enter group name"
+                                        autoFocus
+                                    />
+                                </div>
+
+                                <div className="form-group">
+                                    <label>Duration (Optional)</label>
+                                    <div className="date-picker-container">
+                                        <div className="date-field">
+                                            <span className="label-sm">Start Date</span>
+                                            <DatePicker
+                                                selected={startDate}
+                                                onChange={(date) => setStartDate(date)}
+                                                selectsStart
+                                                startDate={startDate}
+                                                endDate={endDate}
+                                                className="modal-input"
+                                                placeholderText="Select start date"
+                                                dateFormat="yyyy/MM/dd"
+                                            />
+                                        </div>
+                                        <div className="date-field">
+                                            <span className="label-sm">End Date</span>
+                                            <DatePicker
+                                                selected={endDate}
+                                                onChange={(date) => setEndDate(date)}
+                                                selectsEnd
+                                                startDate={startDate}
+                                                endDate={endDate}
+                                                minDate={startDate}
+                                                className="modal-input"
+                                                placeholderText="Select end date"
+                                                dateFormat="yyyy/MM/dd"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="modal-actions">
+                                    <button className="modal-btn cancel" onClick={() => setShowCreateModal(false)}>Cancel</button>
+                                    <button className="modal-btn confirm" onClick={handleCreateGroup}>Create</button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                 </div>
             </div>
+
+            <AiChatWidget />
         </div >
     );
 };

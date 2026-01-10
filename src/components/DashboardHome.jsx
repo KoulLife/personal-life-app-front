@@ -1,59 +1,166 @@
-import React from 'react';
-import { FaFont, FaCode, FaImages, FaLayerGroup } from 'react-icons/fa';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useServices } from '../contexts/ServiceContext';
+import { FaBolt, FaArrowRight, FaGlobeAmericas, FaLayerGroup } from 'react-icons/fa';
+import { motion } from 'framer-motion';
+import './DashboardHome.css';
+
+const container = {
+    hidden: { opacity: 0 },
+    show: {
+        opacity: 1,
+        transition: {
+            staggerChildren: 0.1,
+            delayChildren: 0.2
+        }
+    }
+};
+
+const item = {
+    hidden: { y: 20, opacity: 0 },
+    show: { y: 0, opacity: 1, transition: { type: "spring", stiffness: 50 } }
+};
 
 const DashboardHome = () => {
+    const navigate = useNavigate();
+    const { activeServices } = useServices();
+    const [currentTime, setCurrentTime] = useState(new Date());
+
+    useEffect(() => {
+        const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+        return () => clearInterval(timer);
+    }, []);
+
+    // Time Formatting
+    const formatTime = (date) => {
+        return date.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+    };
+
+    const formatDate = (date) => {
+        return date.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+    };
+
     return (
-        <div className="dashboard-home">
-            <div className="greeting-section">
-                <h1>Start creating with Personal Life</h1>
-                <p style={{ color: 'rgba(255,255,255,0.6)' }}>What would you like to build service?</p>
-            </div>
+        <div className="dashboard-container">
+            {/* Ambient Background Glow (Subtle overlay on top of MainLayout bg) */}
+            <div className="ambient-glow"></div>
 
-            <div className="cards-grid">
-                <div className="dashboard-card">
-                    <div className="card-header">
-                        <FaFont className="card-icon" />
-                        <span>Project Manage</span>
+            <motion.div
+                className="bento-grid"
+                variants={container}
+                initial="hidden"
+                animate="show"
+            >
+                {/* 1. Header / Welcome Block */}
+                <motion.div className="bento-item welcome-box" variants={item}>
+                    <div className="content">
+                        <span className="sub-label">Control Deck</span>
+                        <h1>Good Evening, <br /><span className="gradient-text">Dongik.</span></h1>
+                        <p className="status-text">
+                            <span className="dot pulse"></span>
+                            System Operational
+                        </p>
                     </div>
-                    <div className="card-preview">
-                        {/* Placeholder visual */}
-                        <div style={{ padding: '10px', fontSize: '10px', color: '#aaa' }}>
-                            Write a blog...
+                </motion.div>
+
+                {/* 2. Primary Action - Project Manager */}
+                <motion.div
+                    className="bento-item project-box"
+                    variants={item}
+                    whileHover={{ scale: 1.02, backgroundColor: "rgba(255, 255, 255, 0.08)" }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => navigate('/dashboard/project')}
+                >
+                    <div className="content">
+                        <div className="icon-wrapper primary">
+                            <FaLayerGroup />
+                        </div>
+                        <h3>Project Manager</h3>
+                        <div className="mini-ui-mockup">
+                            <div className="ui-header">
+                                <div className="ui-dot red"></div>
+                                <div className="ui-dot yellow"></div>
+                            </div>
+                            <div className="ui-row">
+                                <div className="ui-checkbox"></div>
+                                <div className="ui-line long"></div>
+                            </div>
+                            <div className="ui-row">
+                                <div className="ui-checkbox"></div>
+                                <div className="ui-line medium"></div>
+                            </div>
+                            <div className="ui-row">
+                                <div className="ui-checkbox"></div>
+                                <div className="ui-line short"></div>
+                            </div>
+                        </div>
+                        <div className="action-row">
+                            <span>Open Workspace</span>
+                            <FaArrowRight />
                         </div>
                     </div>
-                </div>
+                </motion.div>
 
-                <div className="dashboard-card">
-                    <div className="card-header">
-                        <FaCode className="card-icon" />
-                        <span>Financial Manage</span>
+                {/* 3. Clock Widget */}
+                <motion.div className="bento-item clock-box" variants={item}>
+                    <div className="content centered">
+                        <div className="time-display">{formatTime(currentTime)}</div>
+                        <div className="date-display">{formatDate(currentTime)}</div>
                     </div>
-                    <div className="card-preview">
-                        <div style={{ padding: '10px', fontFamily: 'monospace', fontSize: '10px', color: '#88ff88' }}>
-                            &lt;div&gt;Hello&lt;/div&gt;
+                </motion.div>
+
+                {/* 4. Integrations */}
+                <motion.div
+                    className="bento-item integration-box"
+                    variants={item}
+                    whileHover={{ scale: 1.02, backgroundColor: "rgba(255, 255, 255, 0.08)" }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => navigate('/dashboard/service/integration')}
+                >
+                    <div className="content">
+                        <div className="header-row">
+                            <div className="icon-wrapper secondary"><FaBolt /></div>
+                            <div className="active-indicator">
+                                {activeServices?.length || 0} Connected
+                            </div>
+                        </div>
+                        <h3>Integrations</h3>
+                        <p className="caption">Automate your workflow.</p>
+                    </div>
+                </motion.div>
+
+                {/* 5. Activity Graph */}
+                <motion.div className="bento-item activity-box" variants={item}>
+                    <div className="content">
+                        <div className="graph-header">
+                            <span className="label">Productivity</span>
+                            <span className="value-up">+24%</span>
+                        </div>
+                        <div className="mock-graph">
+                            {['30%', '50%', '40%', '70%', '60%', '80%', '95%'].map((h, i) => (
+                                <motion.div
+                                    key={i}
+                                    className="bar"
+                                    initial={{ height: 0 }}
+                                    animate={{ height: h }}
+                                    transition={{ duration: 1, delay: 0.5 + (i * 0.1) }}
+                                />
+                            ))}
                         </div>
                     </div>
-                </div>
+                </motion.div>
 
-                <div className="dashboard-card">
-                    <div className="card-header">
-                        <FaImages className="card-icon" />
-                        <span>Study Record</span>
+                {/* 6. Network Status */}
+                <motion.div className="bento-item status-box" variants={item}>
+                    <div className="content centered">
+                        <div className="status-ring">
+                            <FaGlobeAmericas />
+                            <div className="ring-pulse"></div>
+                        </div>
+                        <div className="status-label">Network Secure</div>
                     </div>
-                    <div className="card-preview" style={{ background: 'linear-gradient(45deg, #333, #555)' }}>
-                    </div>
-                </div>
-
-                <div className="dashboard-card">
-                    <div className="card-header">
-                        <FaLayerGroup className="card-icon" />
-                        <span>Service Map</span>
-                    </div>
-                    <div className="card-preview" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <div style={{ width: '40px', height: '10px', background: '#555', borderRadius: '4px' }}></div>
-                    </div>
-                </div>
-            </div>
+                </motion.div>
+            </motion.div>
         </div>
     );
 };

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import './MainLayout.css';
 import bgImage from '../assets/images/login-backgrounds/login-background.jpg';
@@ -7,10 +7,13 @@ import { FaBars } from 'react-icons/fa';
 
 const MainLayout = () => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const location = useLocation();
 
     const toggleSidebar = () => {
         setSidebarOpen(!sidebarOpen);
     };
+
+    const isAlertPage = location.pathname.includes('/dashboard/alert');
 
     return (
         <div className="main-layout" style={{ backgroundImage: `url(${bgImage})` }}>
@@ -24,7 +27,7 @@ const MainLayout = () => {
 
             <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-            <div className="content-area">
+            <div className={`content-area ${isAlertPage ? 'no-padding' : ''}`}>
                 <Outlet />
             </div>
         </div>

@@ -64,10 +64,14 @@ const Sidebar = ({ isOpen, onClose }) => {
                 )}
 
                 {activeServices.includes('ALERT_MANAGER') && (
-                    <div className="nav-item" onClick={onClose}>
+                    <NavLink
+                        to="/dashboard/alert"
+                        className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+                        onClick={onClose}
+                    >
                         <FaBell className="nav-icon" />
                         <span>Alert Manager</span>
-                    </div>
+                    </NavLink>
                 )}
 
                 {activeServices.includes('FINANCIAL_MANAGER') && (

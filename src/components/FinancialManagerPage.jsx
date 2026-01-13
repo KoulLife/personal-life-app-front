@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaWallet, FaArrowUp, FaArrowDown, FaPlus, FaDownload, FaEllipsisH, FaRobot, FaTimes, FaCalendarAlt, FaUser, FaCoins, FaBullseye, FaFingerprint } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
@@ -30,6 +30,11 @@ const FinancialManagerPage = () => {
 
     // Financial Status Modal State
     const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
+
+    // AI Modal State
+    const [isAiModalOpen, setIsAiModalOpen] = useState(false);
+    const [aiLoading, setAiLoading] = useState(false);
+    const [aiResult, setAiResult] = useState(null);
     const [statusData, setStatusData] = useState({
         age: '',
         job: '',
@@ -57,31 +62,43 @@ const FinancialManagerPage = () => {
 
     // Mock Data for Table
     const [transactions, setTransactions] = useState([
-        { id: 1, date: '3월 23일', desc: 'IT 인프라 구축', category: 'Software', budget: '-₩4,556,000', actual: '-₩6,485,000', variance: '₩1,902,000', status: 'Over' },
-        { id: 2, date: '3월 23일', desc: 'Adobe Creative Cloud', category: 'Software', budget: '-₩1,108,000', actual: '-₩1,381,000', variance: '₩273,000', status: 'Warning' },
-        { id: 3, date: '3월 22일', desc: '프리랜서 정산', category: 'Income', budget: '₩5,000,000', actual: '₩5,200,000', variance: '+₩200,000', status: 'Good' },
-        { id: 4, date: '3월 20일', desc: 'AWS 서버 비용', category: 'Infrastructure', budget: '-₩2,000,000', actual: '-₩1,850,000', variance: '-₩150,000', status: 'Good' },
-        { id: 5, date: '3월 18일', desc: '사무용품 구매', category: 'Operations', budget: '-₩500,000', actual: '-₩450,000', variance: '-₩50,000', status: 'Good' },
-        { id: 6, date: '3월 15일', desc: '마케팅 캠페인', category: 'Marketing', budget: '-₩3,000,000', actual: '-₩3,500,000', variance: '₩500,000', status: 'Warning' },
+        { id: 1, date: '1월 10일', desc: '카페', category: 'Software', budget: '- 4,500원', actual: '-4,500원', variance: '2,748,880원', status: 'Good' },
+        { id: 2, date: '1월 10일', desc: 'Envato 결제', category: 'Software', budget: '-₩1,108,000', actual: '-30,500원', variance: '2,753,380원', status: 'Good' },
+        { id: 3, date: '1월 9일', desc: '카페', category: 'Income', budget: '₩5,000,000', actual: '-3,500원', variance: '2,783,880원', status: 'Good' },
+        { id: 4, date: '1월 9일', desc: 'AWS 서버 비용', category: 'Infrastructure', budget: '-₩2,000,000', actual: '-20,120원', variance: '2,786,880원', status: 'Good' },
+        { id: 5, date: '1월 9일', desc: '사무용품 구매', category: 'Operations', budget: '-₩500,000', actual: '-5,000원', variance: '2,802,000원', status: 'Good' },
+        { id: 6, date: '1월 8일', desc: '카페', category: 'Marketing', budget: '-₩3,000,000', actual: '-3,000원', variance: '2,807,000원', status: 'Good' },
     ]);
 
     // Generate Heatmap Data for Current Month (Jan 2026)
-    const currentDate = new Date('2026-01-10'); // Fixed to current simulation time
-    const currentMonth = currentDate.toLocaleString('ko-KR', { month: 'long', year: 'numeric' });
-    const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
+    const { currentMonth, heatmapData } = useMemo(() => {
+        const currentDate = new Date('2026-01-10'); // Fixed to current simulation time
+        const currentMonth = currentDate.toLocaleString('ko-KR', { month: 'long', year: 'numeric' });
+        const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
 
-    const heatmapData = Array.from({ length: daysInMonth }, (_, i) => {
-        const day = i + 1;
-        const dateStr = `${currentDate.getMonth() + 1}월 ${day}일`;
-        // Mock random levels and amounts for "actual" feel
-        const level = Math.floor(Math.random() * 5); // 0-4
-        const amount = level === 0 ? '0' : (Math.floor(Math.random() * 20) + 1) * 10000;
-        return {
-            date: dateStr,
-            level: level,
-            amount: level === 0 ? '0원' : `₩${amount.toLocaleString()}`
-        };
-    });
+        const data = Array.from({ length: daysInMonth }, (_, i) => {
+            const day = i + 1;
+            const dateStr = `${currentDate.getMonth() + 1}월 ${day}일`;
+
+            // Only paint for days 1-10 as per user request
+            let level = 0;
+            let amount = 0;
+
+            if (day <= 10) {
+                // Mock random levels and amounts for "actual" feel
+                level = Math.floor(Math.random() * 5); // 0-4
+                amount = level === 0 ? '0' : (Math.floor(Math.random() * 20) + 1) * 10000;
+            }
+
+            return {
+                date: dateStr,
+                level: level,
+                amount: level === 0 ? '0원' : `₩${amount.toLocaleString()}`
+            };
+        });
+
+        return { currentMonth, heatmapData: data };
+    }, []);
 
     const handleAddTransaction = (e) => {
         e.preventDefault();
@@ -122,6 +139,32 @@ const FinancialManagerPage = () => {
         });
     };
 
+    const handleAiAnalysis = () => {
+        setIsAiModalOpen(true);
+        setAiLoading(true);
+        setAiResult(null);
+
+        // Simulate AI Analysis
+        setTimeout(() => {
+            setAiLoading(false);
+            setAiResult({
+                score: 78,
+                status: '양호',
+                summary: "전반적인 재정 상태는 안정적이나, '카페/간식' 카테고리의 지출이 또래 평균보다 25% 높습니다. 고정 지출 비율은 이상적입니다.",
+                details: [
+                    { category: '지출 습관', content: '최근 3개월간 불필요한 구독 서비스 지출이 감지되었습니다.', type: 'warning' },
+                    { category: '저축 투자', content: '수입 대비 저축률이 30%로, 목표 달성 가능성이 높습니다.', type: 'positive' },
+                    { category: '예산 관리', content: '월초 대비 월말 지출 속도가 급격히 빨라지는 경향이 있습니다.', type: 'neutral' }
+                ],
+                actions: [
+                    "넷플릭스 프리미엄 요금제 해지 또는 공유 고려",
+                    "카페 이용을 줄이고 텀블러 할인 활용",
+                    "CMA 통장으로 비상금 100만원 이동"
+                ]
+            });
+        }, 3000); // 3 seconds simulation
+    };
+
     return (
         <div className="financial-page">
             <motion.div
@@ -143,19 +186,19 @@ const FinancialManagerPage = () => {
                 {/* Metric Cards Row */}
                 <motion.div className="metric-card revenue" variants={item}>
                     <div className="card-label">총 수익</div>
-                    <div className="card-value">₩ 3,123,094,000</div>
-                    <div className="card-trend positive"> + ₩ 1,234,560 (전월 대비)</div>
+                    <div className="card-value">3,200,000 원</div>
+                    <div className="card-trend positive"> + 100,000 원 (전월 대비)</div>
                 </motion.div>
 
                 <motion.div className="metric-card funds" variants={item}>
                     <div className="card-label">가용 자금</div>
-                    <div className="card-value">₩ 300,941,000</div>
-                    <div className="card-trend positive"> + 12% (예상 대비)</div>
+                    <div className="card-value">3,200,000 원</div>
+                    <div className="card-trend positive"> + 300,000 원 (전월 대비)</div>
                 </motion.div>
 
                 <motion.div className="metric-card expenses" variants={item}>
                     <div className="card-label">총 지출</div>
-                    <div className="card-value">₩ 14,000,000</div>
+                    <div className="card-value">451,120 원</div>
                     <div className="card-trend negative"> - 1.2% (목표 대비)</div>
                 </motion.div>
 
@@ -164,13 +207,13 @@ const FinancialManagerPage = () => {
                     variants={item}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    onClick={() => alert("AI 분석 모달이 여기에 열립니다.")}
+                    onClick={handleAiAnalysis}
                 >
                     <div className="card-label">AI 리포트</div>
                     <div className="card-value flex-center">
-                        <span>AI 피드백 확인</span>
+                        <span>AI 피드백</span>
                     </div>
-                    <div className="card-trend positive"> 2개의 새로운 제안</div>
+                    <div className="card-trend positive">2025/12 소비 피드백</div>
                 </motion.div>
 
                 {/* Financial Status Registration Panel (Black Hole Style) */}
@@ -206,7 +249,7 @@ const FinancialManagerPage = () => {
                         </svg>
                     </div>
                     <div className="chart-axis-x">
-                        <span>1월</span><span>2월</span><span>3월</span><span>4월</span><span>5월</span><span>6월</span><span>7월</span><span>8월</span><span>9월</span>
+                        <span>4월</span><span>5월</span><span>6월</span><span>7월</span><span>8월</span><span>9월</span><span>10월</span><span>11월</span><span>12월</span>
                     </div>
                 </motion.div>
 
@@ -337,7 +380,6 @@ const FinancialManagerPage = () => {
                 )}
             </AnimatePresence>
 
-            {/* Financial Status Modal */}
             <AnimatePresence>
                 {isStatusModalOpen && (
                     <motion.div
@@ -499,6 +541,92 @@ const FinancialManagerPage = () => {
                                     <button type="submit" className="btn-submit">저장하기</button>
                                 </div>
                             </form>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+            {/* AI Feedback Modal */}
+            <AnimatePresence>
+                {isAiModalOpen && (
+                    <motion.div
+                        className="modal-overlay"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                    >
+                        <motion.div
+                            className="modal-content ai-modal-content"
+                            initial={{ scale: 0.8, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.8, opacity: 0 }}
+                        >
+                            <div className="ai-modal-header">
+                                <FaRobot className="ai-modal-icon" />
+                                <h3>AI Financial Guard</h3>
+                                <button className="close-btn" onClick={() => setIsAiModalOpen(false)}><FaTimes /></button>
+                            </div>
+
+                            <div className="ai-modal-body">
+                                {aiLoading ? (
+                                    <div className="ai-loading-container">
+                                        <div className="ai-scanner"></div>
+                                        <p className="loading-text">지출 습관 분석중...</p>
+                                        <div className="loading-steps">
+                                            <span className="step complete">수입/지출 데이터 로드</span>
+                                            <span className="step active">카테고리별 패턴 분석</span>
+                                            <span className="step">또래 비교 알고리즘 실행</span>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    aiResult && (
+                                        <div className="ai-result-container">
+                                            <div className="score-section">
+                                                <div className="score-ring">
+                                                    <svg width="120" height="120">
+                                                        <circle cx="60" cy="60" r="54" fill="none" stroke="#334155" strokeWidth="8" />
+                                                        <circle
+                                                            cx="60" cy="60" r="54" fill="none" stroke="#3b82f6" strokeWidth="8"
+                                                            strokeDasharray="339.292"
+                                                            strokeDashoffset={339.292 * (1 - aiResult.score / 100)}
+                                                            strokeLinecap="round"
+                                                            transform="rotate(-90 60 60)"
+                                                        />
+                                                    </svg>
+                                                    <div className="score-value">
+                                                        <span className="number">{aiResult.score}</span>
+                                                        <span className="label">점</span>
+                                                    </div>
+                                                </div>
+                                                <div className="score-text">
+                                                    <h4>재무 건강 상태 {aiResult.status}</h4>
+                                                    <p>{aiResult.summary}</p>
+                                                </div>
+                                            </div>
+
+                                            <div className="insight-grid">
+                                                {aiResult.details.map((detail, idx) => (
+                                                    <div key={idx} className={`insight-card ${detail.type}`}>
+                                                        <h5>{detail.category}</h5>
+                                                        <p>{detail.content}</p>
+                                                    </div>
+                                                ))}
+                                            </div>
+
+                                            <div className="action-plan">
+                                                <h4>🚀 AI Action Plan</h4>
+                                                <ul>
+                                                    {aiResult.actions.map((action, idx) => (
+                                                        <li key={idx}>
+                                                            <span className="check-icon">✓</span>
+                                                            {action}
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    )
+                                )}
+                            </div>
                         </motion.div>
                     </motion.div>
                 )}

@@ -146,8 +146,8 @@ const DashboardHome = () => {
                                 <span className="value-up">+12%</span>
                             </div>
                             <div className="financial-info">
-                                <span className="label">Total Assets</span>
-                                <span className="value">$24,593</span>
+                                <span className="label">Financial Manager</span>
+                                <span className="value">Check</span>
                             </div>
                             <div className="mini-chart-line">
                                 <div className="chart-track">

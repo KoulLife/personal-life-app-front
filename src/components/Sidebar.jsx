@@ -24,7 +24,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                 </button>
             </div>
 
-            <div className="app-brand desktop-brand">Personal Life</div>
+            <div className="app-brand desktop-brand">CONEX Service</div>
 
             <button className="new-entry-btn" onClick={() => {
                 navigate('/dashboard/service/integration');

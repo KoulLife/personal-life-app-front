@@ -195,6 +195,7 @@
     margin: 0 0 4px 0;
     background: linear-gradient(to right, #fff, #93c5fd);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
 }
@@ -245,6 +246,7 @@
     font-size: 1.5rem;
     background: linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     filter: drop-shadow(0 2px 4px rgba(139, 92, 246, 0.3));
 }
@@ -398,8 +400,6 @@
     background: rgba(255, 255, 255, 0.05);
     border-radius: 4px;
     transition: transform 0.2s, background-color 0.2s;
-    cursor: help;
-    /* Indicate tooltip */
 }
 
 .heatmap-cell:hover {
@@ -427,6 +427,27 @@
 .heatmap-cell.level-4 {
     background: #f87171;
     box-shadow: 0 0 8px #f87171;
+}
+
+/* Heatmap Tooltip */
+.heatmap-tooltip {
+    background: rgba(15, 23, 42, 0.95);
+    border: 1px solid rgba(248, 113, 113, 0.3);
+    border-radius: 8px;
+    padding: 8px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: none;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    white-space: nowrap;
+}
+
+.heatmap-tooltip .tooltip-value {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #fff;
 }
 
 /* 4. Dense Table */
@@ -982,6 +1003,22 @@ select.form-input option {
     animation: pulse 1.5s ease-in-out infinite;
 }
 
+@keyframes bounce {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.bounce {
+    animation: bounce 2s infinite ease-in-out;
+}
+
 @keyframes spin {
     0% {
         transform: rotate(0deg);
@@ -990,6 +1027,18 @@ select.form-input option {
     100% {
         transform: rotate(360deg);
     }
+}
+
+.ai-scanner.fast {
+    animation-duration: 0.5s;
+}
+
+.ai-scanner.fast::before {
+    animation-duration: 0.3s;
+}
+
+.ai-scanner.fast::after {
+    animation-duration: 0.5s;
 }
 
 @keyframes pulse {
@@ -1216,4 +1265,121 @@ select.form-input option {
 .status-dot.over {
     background-color: #f87171;
     box-shadow: 0 0 10px #f87171;
+}
+
+/* Chart Tooltip */
+.chart-tooltip {
+    background: rgba(15, 23, 42, 0.95);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    border-radius: 8px;
+    padding: 8px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: none;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    white-space: nowrap;
+}
+
+.tooltip-value {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 2px;
+}
+
+.tooltip-label {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.chart-point {
+    cursor: pointer;
+    transition: all 0.2s;
+    pointer-events: all;
+}
+
+.chart-point:hover {
+    fill: rgba(255, 255, 255, 0.2);
+    /* Subtle highlight on hover */
+    stroke: rgba(255, 255, 255, 0.5);
+    stroke-width: 2px;
+}
+
+/* Pagination Controls */
+.pagination-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    margin-top: auto;
+}
+
+.pagination-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.7);
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+}
+
+.pagination-btn:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.pagination-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.page-info {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.6);
+    font-variant-numeric: tabular-nums;
+}
+
+/* Category Chips */
+/* Category Chips */
+.category-chips-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.category-chip {
+    padding: 10px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.category-chip:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    transform: translateY(-2px);
+}
+
+.category-chip.selected {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+    font-weight: 600;
 }

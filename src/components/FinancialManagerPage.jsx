@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaWallet, FaArrowUp, FaArrowDown, FaPlus, FaDownload, FaEllipsisH, FaRobot, FaTimes, FaCalendarAlt, FaUser, FaCoins, FaBullseye, FaFingerprint } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
@@ -24,9 +24,16 @@ const item = {
 const FinancialManagerPage = () => {
     const navigate = useNavigate();
 
-    // Transaction Modal State
+    // Financial Summary State
+    const [financialSummary, setFinancialSummary] = useState({
+        monthlyRevenue: 0,
+        monthlyAvailableFunds: 0,
+        monthlyExpenses: 0
+    });
+
+    // Transaction Modal State    
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [newTransaction, setNewTransaction] = useState({ date: new Date(), desc: '', amount: '' });
+    const [newTransaction, setNewTransaction] = useState({ desc: '', amount: '', category: '식비' });
 
     // Financial Status Modal State
     const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
@@ -57,75 +64,289 @@ const FinancialManagerPage = () => {
     // Mock Options
     const households = ['1인 가구', '신혼 부부', '자녀 있음', '부모님 동거', '기타'];
     const mbtis = ['ISTJ', 'ISFJ', 'INFJ', 'INTJ', 'ISTP', 'ISFP', 'INFP', 'INTP', 'ESTP', 'ESFP', 'ENFP', 'ENTP', 'ESTJ', 'ESFJ', 'ENFJ', 'ENTJ'];
-    const categories = ['식비', '카페/간식', '술/유흥', '생활용품', '의류/미용', '취미/여가', '자기계발', '교통/차량', '주거/통신', '경조사/선물'];
+    const categories = ['식비', '카페/간식', '생활용품', '의류/미용', '취미/여가', '자기계발', '교통/차량', '주거/통신', '기타'];
     const times = ['새벽 (00~06시)', '오전 (06~12시)', '오후 (12~18시)', '저녁 (18~22시)', '심야 (22~24시)'];
 
-    // Mock Data for Table
-    const [transactions, setTransactions] = useState([
-        { id: 1, date: '1월 10일', desc: '카페', category: 'Software', budget: '- 4,500원', actual: '-4,500원', variance: '2,748,880원', status: 'Good' },
-        { id: 2, date: '1월 10일', desc: 'Envato 결제', category: 'Software', budget: '-₩1,108,000', actual: '-30,500원', variance: '2,753,380원', status: 'Good' },
-        { id: 3, date: '1월 9일', desc: '카페', category: 'Income', budget: '₩5,000,000', actual: '-3,500원', variance: '2,783,880원', status: 'Good' },
-        { id: 4, date: '1월 9일', desc: 'AWS 서버 비용', category: 'Infrastructure', budget: '-₩2,000,000', actual: '-20,120원', variance: '2,786,880원', status: 'Good' },
-        { id: 5, date: '1월 9일', desc: '사무용품 구매', category: 'Operations', budget: '-₩500,000', actual: '-5,000원', variance: '2,802,000원', status: 'Good' },
-        { id: 6, date: '1월 8일', desc: '카페', category: 'Marketing', budget: '-₩3,000,000', actual: '-3,000원', variance: '2,807,000원', status: 'Good' },
-    ]);
+    const [financialRecords, setFinancialRecords] = useState([]);
+    const [pageInfo, setPageInfo] = useState({
+        pageNumber: 0,
+        totalPages: 0,
+        first: true,
+        last: true
+    });
 
-    // Generate Heatmap Data for Current Month (Jan 2026)
-    const { currentMonth, heatmapData } = useMemo(() => {
-        const currentDate = new Date('2026-01-10'); // Fixed to current simulation time
-        const currentMonth = currentDate.toLocaleString('ko-KR', { month: 'long', year: 'numeric' });
-        const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
+    // Fetch Records
+    const fetchRecords = async (page = 0) => {
+        try {
+            const token = localStorage.getItem('accessToken');
+            const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8080'}/financial/records?page=${page}&size=10`, {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            });
 
-        const data = Array.from({ length: daysInMonth }, (_, i) => {
-            const day = i + 1;
-            const dateStr = `${currentDate.getMonth() + 1}월 ${day}일`;
-
-            // Only paint for days 1-10 as per user request
-            let level = 0;
-            let amount = 0;
-
-            if (day <= 10) {
-                // Mock random levels and amounts for "actual" feel
-                level = Math.floor(Math.random() * 5); // 0-4
-                amount = level === 0 ? '0' : (Math.floor(Math.random() * 20) + 1) * 10000;
+            if (response.ok) {
+                const data = await response.json();
+                setFinancialRecords(data.content || []);
+                setPageInfo({
+                    pageNumber: data.pageable.pageNumber,
+                    totalPages: data.totalPages,
+                    first: data.first,
+                    last: data.last
+                });
             }
-
-            return {
-                date: dateStr,
-                level: level,
-                amount: level === 0 ? '0원' : `₩${amount.toLocaleString()}`
-            };
-        });
-
-        return { currentMonth, heatmapData: data };
-    }, []);
-
-    const handleAddTransaction = (e) => {
-        e.preventDefault();
-
-        // Format date to "MMM DD" style like existing data -> Korean style "MM월 DD일"
-        const dateStr = newTransaction.date.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' });
-
-        const newItem = {
-            id: Date.now(),
-            date: dateStr,
-            desc: newTransaction.desc,
-            category: 'Manual',
-            budget: '-',
-            actual: `₩${Number(newTransaction.amount).toLocaleString()}`,
-            variance: '-',
-            status: 'Good'
-        };
-        setTransactions([newItem, ...transactions]);
-        setIsModalOpen(false);
-        setNewTransaction({ date: new Date(), desc: '', amount: '' });
+        } catch (error) {
+            console.error('Error fetching records:', error);
+        }
     };
 
-    const handleStatusSubmit = (e) => {
+    useEffect(() => {
+        fetchRecords(0);
+    }, []);
+
+    // ... (keep other effects)
+
+    // ... (inside render)
+
+
+
+    // Heatmap Data State
+    const [currentMonth, setCurrentMonth] = useState('');
+    const [heatmapData, setHeatmapData] = useState([]);
+    const [heatmapTooltip, setHeatmapTooltip] = useState(null);
+
+    // Graph Data State
+    const [graphData, setGraphData] = useState({
+        revenue: [],
+        availableFunds: [],
+        expenses: []
+    });
+    const [hoveredPoint, setHoveredPoint] = useState(null);
+
+    // Fetch Financial Summary & Graph from Backend
+    useEffect(() => {
+        const fetchFinancialData = async () => {
+            try {
+                const token = localStorage.getItem('accessToken');
+                const headers = {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                };
+
+                // Fetch Summary
+                const summaryResponse = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8080'}/financial/summary`, {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: headers
+                });
+
+                if (summaryResponse.ok) {
+                    const data = await summaryResponse.json();
+                    setFinancialSummary({
+                        monthlyRevenue: data.monthlyRevenue || 0,
+                        monthlyAvailableFunds: data.monthlyAvailableFunds || 0,
+                        monthlyExpenses: data.monthlyExpenses || 0
+                    });
+                }
+
+                // Fetch Graph Data
+                const graphResponse = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8080'}/financial/graph`, {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: headers
+                });
+
+                if (graphResponse.ok) {
+                    const data = await graphResponse.json();
+                    setGraphData({
+                        revenue: data.revenue || [],
+                        availableFunds: data.availableFunds || [],
+                        expenses: data.expenses || []
+                    });
+                }
+
+                // Fetch Heatmap Data
+                const currentDate = new Date();
+                const year = currentDate.getFullYear();
+                const month = currentDate.getMonth() + 1;
+
+                const heatmapResponse = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8080'}/financial/heatmap?year=${year}&month=${month}`, {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: headers
+                });
+
+                if (heatmapResponse.ok) {
+                    const heatmapDataRaw = await heatmapResponse.json();
+
+                    // Set current month label
+                    setCurrentMonth(currentDate.toLocaleString('ko-KR', { month: 'long', year: 'numeric' }));
+
+                    // Transform response to array format
+                    const daysInMonth = new Date(year, month, 0).getDate();
+                    const transformedData = Array.from({ length: daysInMonth }, (_, i) => {
+                        const day = i + 1;
+                        const amount = heatmapDataRaw[day] || 0;
+
+                        // Calculate level (0-4) based on amount
+                        let level = 0;
+                        if (amount > 0) {
+                            if (amount < 5000) level = 1;
+                            else if (amount < 15000) level = 2;
+                            else if (amount < 30000) level = 3;
+                            else level = 4;
+                        }
+
+                        return {
+                            day: day,
+                            amount: amount,
+                            level: level
+                        };
+                    });
+
+                    setHeatmapData(transformedData);
+                }
+
+            } catch (error) {
+                console.error('Error fetching financial data:', error);
+            }
+        };
+
+        fetchFinancialData();
+    }, []);
+
+    // Fetch Financial Profile when modal opens
+    useEffect(() => {
+        const fetchProfile = async () => {
+            if (!isStatusModalOpen) return;
+
+            try {
+                const token = localStorage.getItem('accessToken');
+                const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8080'}/financial-profile`, {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.profileData) {
+                        // Map backend fields to frontend state
+                        setStatusData({
+                            age: data.profileData.age || '',
+                            job: data.profileData.occupation || '',
+                            household: data.profileData.householdType || '1인 가구',
+                            income: data.profileData.monthlyIncome || '',
+                            fixedExpense: data.profileData.fixedExpenses || '',
+                            assets: data.profileData.totalAssets || '',
+                            debt: data.profileData.totalDebt || '',
+                            goal: data.profileData.financialGoal || '',
+                            goalAmount: data.profileData.goalAmount || '',
+                            goalDate: data.profileData.goalDeadline ? new Date(data.profileData.goalDeadline) : new Date(),
+                            hightPriority: data.profileData.highPriorityCategories || [],
+                            lowPriority: data.profileData.lowPriorityCategories || [],
+                            feedbackStyle: data.profileData.feedbackPreference || '팩트 폭행',
+                            mbti: data.profileData.mbti || '',
+                            activityTime: data.profileData.preferredActivityTime || '저녁 (18~22시)',
+                            investmentRisk: data.profileData.riskTolerance || '중립형'
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching profile:', error);
+            }
+        };
+
+        fetchProfile();
+    }, [isStatusModalOpen]);
+
+    const handleAddTransaction = async (e) => {
         e.preventDefault();
-        console.log("Status Data Submitted:", statusData);
-        alert("재정 상태가 업데이트 되었습니다. AI 분석이 시작됩니다.");
-        setIsStatusModalOpen(false);
+
+        try {
+            const token = localStorage.getItem('accessToken');
+            const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8080'}/financial/record`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    description: newTransaction.desc,
+                    amount: Number(newTransaction.amount),
+                    category: newTransaction.category
+                })
+            });
+
+            if (response.ok) {
+                // Refresh list
+                await fetchRecords(0);
+                setIsModalOpen(false);
+                setNewTransaction({ desc: '', amount: '', category: '식비' });
+            } else {
+                console.error('Failed to add transaction');
+                alert('소비 내역 추가에 실패했습니다.');
+            }
+        } catch (error) {
+            console.error('Error adding transaction:', error);
+            alert('오류가 발생했습니다.');
+        }
+    };
+
+    const handleStatusSubmit = async (e) => {
+        e.preventDefault();
+
+        try {
+            const token = localStorage.getItem('accessToken');
+
+            // Map frontend state to backend fields
+            const profilePayload = {
+                age: statusData.age,
+                occupation: statusData.job,
+                householdType: statusData.household,
+                monthlyIncome: statusData.income,
+                fixedExpenses: statusData.fixedExpense,
+                totalAssets: statusData.assets,
+                totalDebt: statusData.debt,
+                financialGoal: statusData.goal,
+                goalAmount: statusData.goalAmount,
+                goalDeadline: statusData.goalDate.toISOString(),
+                highPriorityCategories: statusData.hightPriority,
+                lowPriorityCategories: statusData.lowPriority,
+                feedbackPreference: statusData.feedbackStyle,
+                mbti: statusData.mbti,
+                preferredActivityTime: statusData.activityTime,
+                riskTolerance: statusData.investmentRisk
+            };
+
+            const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8080'}/financial-profile`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(profilePayload)
+            });
+
+            if (response.ok) {
+                alert('재정 상태가 업데이트 되었습니다. AI 분석이 시작됩니다.');
+                setIsStatusModalOpen(false);
+            } else {
+                console.error('Failed to save profile');
+                alert('재정 상태 저장에 실패했습니다.');
+            }
+        } catch (error) {
+            console.error('Error saving profile:', error);
+            alert('오류가 발생했습니다.');
+        }
     };
 
     const toggleChip = (category, type) => {
@@ -139,30 +360,52 @@ const FinancialManagerPage = () => {
         });
     };
 
-    const handleAiAnalysis = () => {
+    const handleAiAnalysis = async () => {
         setIsAiModalOpen(true);
         setAiLoading(true);
         setAiResult(null);
 
-        // Simulate AI Analysis
-        setTimeout(() => {
-            setAiLoading(false);
-            setAiResult({
-                score: 78,
-                status: '양호',
-                summary: "전반적인 재정 상태는 안정적이나, '카페/간식' 카테고리의 지출이 또래 평균보다 25% 높습니다. 고정 지출 비율은 이상적입니다.",
-                details: [
-                    { category: '지출 습관', content: '최근 3개월간 불필요한 구독 서비스 지출이 감지되었습니다.', type: 'warning' },
-                    { category: '저축 투자', content: '수입 대비 저축률이 30%로, 목표 달성 가능성이 높습니다.', type: 'positive' },
-                    { category: '예산 관리', content: '월초 대비 월말 지출 속도가 급격히 빨라지는 경향이 있습니다.', type: 'neutral' }
-                ],
-                actions: [
-                    "넷플릭스 프리미엄 요금제 해지 또는 공유 고려",
-                    "카페 이용을 줄이고 텀블러 할인 활용",
-                    "CMA 통장으로 비상금 100만원 이동"
-                ]
+        try {
+            const token = localStorage.getItem('accessToken');
+            const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8080'}/financial/ai-report`, {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
             });
-        }, 3000); // 3 seconds simulation
+
+            const contentType = response.headers.get("content-type");
+
+            if (response.ok) {
+                if (contentType && contentType.indexOf("application/json") !== -1) {
+                    const data = await response.json();
+                    setAiResult(data);
+                    setAiLoading(false);
+                } else {
+                    const text = await response.text();
+                    if (text.includes("AI가 리포트를 생성 중입니다")) {
+                        // Still generating
+                        setAiResult({ status: 'analyzing', message: text });
+                    } else {
+                        // Unexpected text response
+                        console.warn("Unexpected text response:", text);
+                        setAiResult(null);
+                    }
+                    // Keep loading state or show specific "analyzing" UI?
+                    // The user said: "AI가 리포트를 생성 중입니다..." response comes if not ready.
+                    // We can show this message in the UI.
+                    setAiLoading(false);
+                }
+            } else {
+                console.error('Failed to fetch AI report');
+                setAiLoading(false);
+            }
+        } catch (error) {
+            console.error('Error fetching AI report:', error);
+            setAiLoading(false);
+        }
     };
 
     return (
@@ -186,19 +429,19 @@ const FinancialManagerPage = () => {
                 {/* Metric Cards Row */}
                 <motion.div className="metric-card revenue" variants={item}>
                     <div className="card-label">총 수익</div>
-                    <div className="card-value">3,200,000 원</div>
+                    <div className="card-value">{financialSummary.monthlyRevenue.toLocaleString()} 원</div>
                     <div className="card-trend positive"> + 100,000 원 (전월 대비)</div>
                 </motion.div>
 
                 <motion.div className="metric-card funds" variants={item}>
                     <div className="card-label">가용 자금</div>
-                    <div className="card-value">3,200,000 원</div>
+                    <div className="card-value">{financialSummary.monthlyAvailableFunds.toLocaleString()} 원</div>
                     <div className="card-trend positive"> + 300,000 원 (전월 대비)</div>
                 </motion.div>
 
                 <motion.div className="metric-card expenses" variants={item}>
                     <div className="card-label">총 지출</div>
-                    <div className="card-value">451,120 원</div>
+                    <div className="card-value">{financialSummary.monthlyExpenses.toLocaleString()} 원</div>
                     <div className="card-trend negative"> - 1.2% (목표 대비)</div>
                 </motion.div>
 
@@ -232,32 +475,154 @@ const FinancialManagerPage = () => {
                 </motion.div>
 
                 {/* Financial Graph Section */}
-                <motion.div className="card chart-card-lg" variants={item}>
+                <motion.div className="card chart-card-lg" variants={item} style={{ position: 'relative' }}>
                     <div className="card-header">
                         <h3>재무 그래프</h3>
+                        {/* Tooltip */}
+                        {hoveredPoint && (
+                            <div className="chart-tooltip" style={{
+                                left: hoveredPoint.x,
+                                top: hoveredPoint.y - 40,
+                                position: 'absolute',
+                                transform: 'translateX(-50%)',
+                                zIndex: 10
+                            }}>
+                                <span className="tooltip-value">{hoveredPoint.value}</span>
+                                <span className="tooltip-label">{hoveredPoint.label}</span>
+                            </div>
+                        )}
                     </div>
                     <div className="chart-legend">
                         <span className="legend-item"><span className="dot green"></span>총 수익</span>
                         <span className="legend-item"><span className="dot blue"></span>가용 자금</span>
                         <span className="legend-item"><span className="dot red"></span>총 지출</span>
                     </div>
-                    <div className="mock-line-chart">
+                    <div className="mock-line-chart" style={{ position: 'relative' }}>
                         <svg width="100%" height="100%" viewBox="0 0 500 150" preserveAspectRatio="none">
-                            <polyline fill="none" stroke="#22c55e" strokeWidth="2" points="0,110 50,105 100,60 150,70 200,50 250,45 300,40 350,35 400,30 450,25 500,20" />
-                            <polyline fill="none" stroke="#3b82f6" strokeWidth="2" strokeDasharray="4" points="0,90 50,85 100,50 150,55 200,60 250,50 300,55 350,60 400,65 450,70 500,75" />
-                            <polyline fill="none" stroke="#f87171" strokeWidth="2" strokeDasharray="2" points="0,130 50,125 100,120 150,115 200,110 250,105 300,100 350,95 400,110 450,115 500,120" />
+                            {(() => {
+                                const width = 500;
+                                const height = 150;
+                                const padding = 20;
+                                const dataLength = 9;
+
+                                // Helper to get max value for scaling
+                                const allValues = [
+                                    ...graphData.revenue,
+                                    ...graphData.availableFunds,
+                                    ...graphData.expenses
+                                ];
+                                const maxValue = Math.max(...allValues, 100000); // Minimum scale
+
+                                // Helper to calculate points
+                                const getPoints = (data) => {
+                                    return data.map((val, index) => {
+                                        const x = (index / (dataLength - 1)) * width;
+                                        const y = height - (val / maxValue) * (height - padding) - padding / 2;
+                                        return `${x},${y}`;
+                                    }).join(' ');
+                                };
+
+                                // Calculate points for tooltips
+                                const renderInteractionPoints = (data, labelPrefix, color) => {
+                                    return data.map((val, index) => {
+                                        const x = (index / (dataLength - 1)) * width;
+                                        const y = height - (val / maxValue) * (height - padding) - padding / 2;
+
+                                        // Calculate month for tooltip
+                                        const date = new Date();
+                                        date.setMonth(date.getMonth() - (dataLength - 1 - index));
+                                        const monthLabel = `${date.getMonth() + 1}월`;
+
+                                        return (
+                                            <circle
+                                                key={`${labelPrefix}-${index}`}
+                                                cx={x}
+                                                cy={y}
+                                                r="6"
+                                                fill="transparent"
+                                                className="chart-point"
+                                                onMouseEnter={(e) => {
+                                                    const rect = e.target.getBoundingClientRect();
+                                                    // Calculate relative position for tooltip
+                                                    const parent = e.target.closest('.chart-card-lg');
+                                                    const parentRect = parent.getBoundingClientRect();
+
+                                                    setHoveredPoint({
+                                                        x: rect.left - parentRect.left + rect.width / 2,
+                                                        y: rect.top - parentRect.top,
+                                                        value: `${val.toLocaleString()}원`,
+                                                        label: `${monthLabel} ${labelPrefix}`
+                                                    });
+                                                }}
+                                                onMouseLeave={() => setHoveredPoint(null)}
+                                            />
+                                        );
+                                    });
+                                };
+
+                                return (
+                                    <>
+                                        {/* Revenue (Green) */}
+                                        <polyline
+                                            fill="none"
+                                            stroke="#22c55e"
+                                            strokeWidth="2"
+                                            points={getPoints(graphData.revenue)}
+                                        />
+
+                                        {/* Available Funds (Blue) */}
+                                        <polyline
+                                            fill="none"
+                                            stroke="#3b82f6"
+                                            strokeWidth="2"
+                                            strokeDasharray="4"
+                                            points={getPoints(graphData.availableFunds)}
+                                        />
+
+                                        {/* Expenses (Red) */}
+                                        <polyline
+                                            fill="none"
+                                            stroke="#f87171"
+                                            strokeWidth="2"
+                                            strokeDasharray="2"
+                                            points={getPoints(graphData.expenses)}
+                                        />
+
+                                        {/* Interaction Layers */}
+                                        {renderInteractionPoints(graphData.revenue, '총 수익', '#22c55e')}
+                                        {renderInteractionPoints(graphData.availableFunds, '가용 자금', '#3b82f6')}
+                                        {renderInteractionPoints(graphData.expenses, '총 지출', '#f87171')}
+                                    </>
+                                );
+                            })()}
                         </svg>
                     </div>
                     <div className="chart-axis-x">
-                        <span>4월</span><span>5월</span><span>6월</span><span>7월</span><span>8월</span><span>9월</span><span>10월</span><span>11월</span><span>12월</span>
+                        {Array.from({ length: 9 }).map((_, i) => {
+                            const date = new Date();
+                            date.setMonth(date.getMonth() - (8 - i));
+                            return <span key={i}>{date.getMonth() + 1}월</span>;
+                        })}
                     </div>
                 </motion.div>
 
                 {/* Monthly Spending Heatmap Section */}
-                <motion.div className="card chart-card-lg" variants={item}>
+                <motion.div className="card chart-card-lg" variants={item} style={{ position: 'relative' }}>
                     <div className="card-header">
                         <h3>월별 지출</h3>
                         <span className="month-label">{currentMonth}</span>
+                        {/* Tooltip */}
+                        {heatmapTooltip && (
+                            <div className="heatmap-tooltip" style={{
+                                left: heatmapTooltip.x,
+                                top: heatmapTooltip.y,
+                                position: 'absolute',
+                                transform: 'translate(-50%, -120%)',
+                                zIndex: 10
+                            }}>
+                                <span className="tooltip-value">{heatmapTooltip.month}월 {heatmapTooltip.day}일: {heatmapTooltip.amount.toLocaleString()}원</span>
+                            </div>
+                        )}
                     </div>
                     <div className="heatmap-container">
                         <div className="heatmap-grid" style={{ gridTemplateRows: 'repeat(5, 1fr)' }}>
@@ -265,7 +630,20 @@ const FinancialManagerPage = () => {
                                 <div
                                     key={index}
                                     className={`heatmap-cell level-${data.level}`}
-                                    title={`${data.date}: ${data.amount}`}
+                                    onMouseEnter={(e) => {
+                                        const rect = e.target.getBoundingClientRect();
+                                        const parent = e.target.closest('.chart-card-lg');
+                                        const parentRect = parent.getBoundingClientRect();
+
+                                        setHeatmapTooltip({
+                                            day: data.day,
+                                            month: new Date().getMonth() + 1,
+                                            amount: data.amount,
+                                            x: rect.left - parentRect.left + rect.width / 2,
+                                            y: rect.top - parentRect.top
+                                        });
+                                    }}
+                                    onMouseLeave={() => setHeatmapTooltip(null)}
                                 ></div>
                             ))}
                         </div>
@@ -288,29 +666,53 @@ const FinancialManagerPage = () => {
                                 <tr>
                                     <th className="left">일자</th>
                                     <th className="left">소비 내역</th>
-                                    <th className="left">금액</th>
-                                    <th className="right">여유 금액</th>
+                                    <th className="left">카테고리</th>
+                                    <th className="right">금액</th>
                                     <th className="center">상태</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {transactions.map(row => (
-                                    <tr key={row.id}>
-                                        <td className="left muted">{row.date}</td>
-                                        <td className="left"><span className="row-title">{row.desc}</span></td>
-                                        <td className="left bold">{row.actual}</td>
-                                        <td className="right">
-                                            <span className={`variance-tag ${row.variance.includes('-') ? 'good' : 'bad'}`}>
-                                                {row.variance}
-                                            </span>
-                                        </td>
-                                        <td className="center">
-                                            <span className={`status-dot ${row.status.toLowerCase()}`}></span>
-                                        </td>
+                                {financialRecords.length > 0 ? (
+                                    financialRecords.map(row => (
+                                        <tr key={row.financialRecordId}>
+                                            <td className="left muted">
+                                                {new Date(row.createdDate).toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' })}
+                                            </td>
+                                            <td className="left"><span className="row-title">{row.description}</span></td>
+                                            <td className="left">{row.category}</td>
+                                            <td className="right bold">
+                                                {row.amount.toLocaleString()}원
+                                            </td>
+                                            <td className="center">
+                                                <span className={`status-dot ${row.amount > 50000 ? 'over' : 'good'}`}></span>
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan="5" className="center">데이터가 없습니다.</td>
                                     </tr>
-                                ))}
+                                )}
                             </tbody>
                         </table>
+                    </div>
+                    {/* Pagination */}
+                    <div className="pagination-controls">
+                        <button
+                            className="pagination-btn"
+                            disabled={pageInfo.first}
+                            onClick={() => fetchRecords(pageInfo.pageNumber - 1)}
+                        >
+                            &lt; 이전
+                        </button>
+                        <span className="page-info">{pageInfo.pageNumber + 1} / {pageInfo.totalPages === 0 ? 1 : pageInfo.totalPages}</span>
+                        <button
+                            className="pagination-btn"
+                            disabled={pageInfo.last}
+                            onClick={() => fetchRecords(pageInfo.pageNumber + 1)}
+                        >
+                            다음 &gt;
+                        </button>
                     </div>
                 </motion.div>
             </motion.div>
@@ -335,17 +737,19 @@ const FinancialManagerPage = () => {
                                 <button className="close-btn" onClick={() => setIsModalOpen(false)}><FaTimes /></button>
                             </div>
                             <form onSubmit={handleAddTransaction}>
+
                                 <div className="form-group">
-                                    <label>일자</label>
-                                    <div className="custom-datepicker-wrapper">
-                                        <DatePicker
-                                            selected={newTransaction.date}
-                                            onChange={(date) => setNewTransaction({ ...newTransaction, date })}
-                                            className="form-input"
-                                            dateFormat="yyyy-MM-dd"
-                                            locale="ko"
-                                        />
-                                        <FaCalendarAlt className="calendar-icon" />
+                                    <label>카테고리</label>
+                                    <div className="category-chips-container">
+                                        {categories.map((cat) => (
+                                            <div
+                                                key={cat}
+                                                className={`category-chip ${newTransaction.category === cat ? 'selected' : ''}`}
+                                                onClick={() => setNewTransaction({ ...newTransaction, category: cat })}
+                                            >
+                                                {cat}
+                                            </div>
+                                        ))}
                                     </div>
                                 </div>
                                 <div className="form-group">
@@ -576,6 +980,11 @@ const FinancialManagerPage = () => {
                                             <span className="step active">카테고리별 패턴 분석</span>
                                             <span className="step">또래 비교 알고리즘 실행</span>
                                         </div>
+                                    </div>
+                                ) : aiResult && aiResult.status === 'analyzing' ? (
+                                    <div className="ai-loading-container">
+                                        <FaRobot className="ai-icon bounce" style={{ fontSize: '3rem', marginBottom: '1rem' }} />
+                                        <p className="loading-text" style={{ color: '#fff' }}>{aiResult.message}</p>
                                     </div>
                                 ) : (
                                     aiResult && (

@@ -911,7 +911,9 @@ select.form-input option {
 /* --- AI Feedback Modal Styles --- */
 
 .modal-content.ai-modal-content {
-    width: 650px;
+    width: 800px;
+    max-width: 90vw;
+    max-height: 85vh;
     background: rgba(15, 23, 42, 0.95);
     backdrop-filter: blur(20px);
     border: 1px solid rgba(139, 92, 246, 0.3);
@@ -919,6 +921,8 @@ select.form-input option {
     box-shadow: 0 0 40px rgba(139, 92, 246, 0.2);
     padding: 0;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 .ai-modal-header {
@@ -950,9 +954,10 @@ select.form-input option {
 
 .ai-modal-body {
     padding: 30px;
-    min-height: 400px;
     display: flex;
     flex-direction: column;
+    overflow-y: auto;
+    max-height: calc(85vh - 80px);
 }
 
 /* Loading State - Scanner */
@@ -1165,8 +1170,8 @@ select.form-input option {
 
 .insight-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
     margin-bottom: 30px;
 }
 

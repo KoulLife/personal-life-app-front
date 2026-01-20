@@ -385,18 +385,22 @@ const FinancialManagerPage = () => {
                     setAiLoading(false);
                 } else {
                     const text = await response.text();
-                    if (text.includes("AI가 리포트를 생성 중입니다")) {
-                        // Still generating
-                        setAiResult({ status: 'analyzing', message: text });
-                    } else {
-                        // Unexpected text response
-                        console.warn("Unexpected text response:", text);
-                        setAiResult(null);
+
+                    // Try to parse as JSON first (in case Content-Type is not set correctly)
+                    try {
+                        const data = JSON.parse(text);
+                        setAiResult(data);
+                        setAiLoading(false);
+                    } catch (e) {
+                        // Not JSON, check if it's a "generating" message
+                        if (text.includes("AI가 리포트를 생성 중입니다")) {
+                            setAiResult({ status: 'analyzing', message: text });
+                        } else {
+                            console.warn("Unexpected text response:", text);
+                            setAiResult(null);
+                        }
+                        setAiLoading(false);
                     }
-                    // Keep loading state or show specific "analyzing" UI?
-                    // The user said: "AI가 리포트를 생성 중입니다..." response comes if not ready.
-                    // We can show this message in the UI.
-                    setAiLoading(false);
                 }
             } else {
                 console.error('Failed to fetch AI report');
